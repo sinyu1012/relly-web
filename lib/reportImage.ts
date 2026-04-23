@@ -1,7 +1,8 @@
-import type { MetadataField, QuickScanResult } from "@/lib/types";
+import type { AiImageAnalysisResult, MetadataField, QuickScanResult } from "@/lib/types";
 
 const REPORT_WIDTH = 1200;
 const REPORT_HEIGHT = 1850;
+const REPORT_HEIGHT_WITH_AI = 2320;
 
 const COLORS = {
   bg: "#0A0A0A",
@@ -129,6 +130,29 @@ function drawLabelValue(
   return drawWrappedText(ctx, value, x + labelWidth, y, width - labelWidth, 29, 2);
 }
 
+function drawBulletList(
+  ctx: CanvasRenderingContext2D,
+  items: string[],
+  x: number,
+  y: number,
+  width: number,
+  maxItems: number,
+): number {
+  let nextY = y;
+
+  for (const item of items.slice(0, maxItems)) {
+    ctx.font = "700 22px Menlo, Consolas, monospace";
+    ctx.fillStyle = COLORS.accent;
+    ctx.fillText("-", x, nextY);
+    ctx.font =
+      "22px -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif";
+    ctx.fillStyle = COLORS.muted;
+    nextY = drawWrappedText(ctx, item, x + 28, nextY, width - 28, 30, 2) + 12;
+  }
+
+  return nextY;
+}
+
 function drawPill(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -183,10 +207,71 @@ function firstValue(fields: MetadataField[], label: string): string | null {
   return fields.find((field) => field.label === label)?.value ?? null;
 }
 
-export async function createReportImageBlob(result: QuickScanResult): Promise<Blob> {
+function drawAiAnalysisSection(
+  ctx: CanvasRenderingContext2D,
+  aiImageAnalysis: AiImageAnalysisResult,
+  top: number,
+) {
+  const height = 350;
+  ctx.fillStyle = COLORS.surface;
+  ctx.fillRect(76, top, 1048, height);
+  ctx.strokeStyle = COLORS.accent;
+  ctx.strokeRect(76, top, 1048, height);
+
+  ctx.font = "700 30px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+  ctx.fillStyle = COLORS.text;
+  ctx.fillText("AI 图片内容推理", 112, top + 58);
+
+  drawPill(
+    ctx,
+    riskLabels[aiImageAnalysis.riskBand],
+    760,
+    top + 28,
+    riskColor(aiImageAnalysis.riskBand),
+  );
+  ctx.font = "700 42px Menlo, Consolas, monospace";
+  ctx.fillStyle = riskColor(aiImageAnalysis.riskBand);
+  ctx.fillText(`${aiImageAnalysis.aiRiskScore}`, 990, top + 70);
+  ctx.font = "20px Menlo, Consolas, monospace";
+  ctx.fillStyle = COLORS.muted;
+  ctx.fillText("/ 100", 1050, top + 68);
+
+  ctx.font =
+    "24px -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif";
+  ctx.fillStyle = COLORS.text;
+  const summaryBottom = drawWrappedText(
+    ctx,
+    aiImageAnalysis.summary,
+    112,
+    top + 118,
+    960,
+    34,
+    2,
+  );
+
+  ctx.font = "700 22px Menlo, Consolas, monospace";
+  ctx.fillStyle = COLORS.accent;
+  ctx.fillText("FINDINGS", 112, summaryBottom + 34);
+  drawBulletList(
+    ctx,
+    aiImageAnalysis.findings.length
+      ? aiImageAnalysis.findings
+      : aiImageAnalysis.checks.map((check) => check.detail),
+    112,
+    summaryBottom + 74,
+    960,
+    3,
+  );
+}
+
+export async function createReportImageBlob(
+  result: QuickScanResult,
+  aiImageAnalysis?: AiImageAnalysisResult | null,
+): Promise<Blob> {
+  const reportHeight = aiImageAnalysis ? REPORT_HEIGHT_WITH_AI : REPORT_HEIGHT;
   const canvas = document.createElement("canvas");
   canvas.width = REPORT_WIDTH;
-  canvas.height = REPORT_HEIGHT;
+  canvas.height = reportHeight;
   const ctx = canvas.getContext("2d");
 
   if (!ctx) {
@@ -194,10 +279,10 @@ export async function createReportImageBlob(result: QuickScanResult): Promise<Bl
   }
 
   ctx.fillStyle = COLORS.bg;
-  ctx.fillRect(0, 0, REPORT_WIDTH, REPORT_HEIGHT);
+  ctx.fillRect(0, 0, REPORT_WIDTH, reportHeight);
   ctx.strokeStyle = COLORS.border;
   ctx.lineWidth = 2;
-  ctx.strokeRect(36, 36, REPORT_WIDTH - 72, REPORT_HEIGHT - 72);
+  ctx.strokeRect(36, 36, REPORT_WIDTH - 72, reportHeight - 72);
 
   ctx.fillStyle = COLORS.text;
   ctx.font =
@@ -281,7 +366,11 @@ export async function createReportImageBlob(result: QuickScanResult): Promise<Bl
     500,
   );
 
-  const evidenceTop = 930;
+  if (aiImageAnalysis) {
+    drawAiAnalysisSection(ctx, aiImageAnalysis, 930);
+  }
+
+  const evidenceTop = aiImageAnalysis ? 1360 : 930;
   const evidenceHeight = 500;
   const evidenceBottom = evidenceTop + evidenceHeight - 34;
   ctx.fillStyle = COLORS.surface;
@@ -324,7 +413,7 @@ export async function createReportImageBlob(result: QuickScanResult): Promise<Bl
     }
   }
 
-  const noteTop = 1480;
+  const noteTop = aiImageAnalysis ? 1910 : 1480;
   ctx.fillStyle = COLORS.surface;
   ctx.fillRect(76, noteTop, 1048, 180);
   ctx.strokeStyle = COLORS.border;
@@ -338,8 +427,8 @@ export async function createReportImageBlob(result: QuickScanResult): Promise<Bl
 
   ctx.font = "20px Menlo, Consolas, monospace";
   ctx.fillStyle = COLORS.muted;
-  ctx.fillText(`Case ID: ${result.caseId}`, 76, 1738);
-  ctx.fillText(`Generated: ${new Date().toISOString()}`, 76, 1772);
+  ctx.fillText(`Case ID: ${result.caseId}`, 76, reportHeight - 112);
+  ctx.fillText(`Generated: ${new Date().toISOString()}`, 76, reportHeight - 78);
 
   return canvasToBlob(canvas);
 }

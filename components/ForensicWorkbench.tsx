@@ -249,12 +249,14 @@ export function ForensicWorkbench({
 
     setIsAnalyzingImage(true);
     setAiImageAnalysisError("");
+    setReportExportError("");
 
     try {
       const analysis = await analyzeImage({
         file: selectedAsset.file,
       });
       setAiImageAnalysis(analysis);
+      setReportImageUrl("");
     } catch (error) {
       setAiImageAnalysisError(
         error instanceof Error ? error.message : "AI 图片分析失败，请稍后重试。",
@@ -273,7 +275,7 @@ export function ForensicWorkbench({
     setReportExportError("");
 
     try {
-      const blob = await createReportImageBlob(result);
+      const blob = await createReportImageBlob(result, aiImageAnalysis);
       const nextReportUrl = URL.createObjectURL(blob);
       setReportImageUrl(nextReportUrl);
       downloadBlob(`${result.caseId.toLowerCase()}-report.png`, nextReportUrl);
