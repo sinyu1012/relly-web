@@ -26,6 +26,16 @@ function buildMockResult(previewUrl: string): QuickScanResult {
       generator: null,
       title: null,
       validationMessages: [],
+      details: [{ label: "C2PA Status", value: "无" }],
+      claimGeneratorInfo: [],
+      signature: [],
+      assertions: [],
+      actions: [],
+      aiFootprint: {
+        status: "unknown",
+        model: null,
+        signals: ["未检测到可展开的 C2PA manifest。"],
+      },
     },
     metadata: {
       format: "JPEG",
@@ -39,6 +49,16 @@ function buildMockResult(previewUrl: string): QuickScanResult {
       hasXmp: false,
       gps: { present: false, redacted: true },
       note: "未读取到足够元数据。",
+      fields: [
+        { label: "MIME", value: "image/jpeg" },
+        { label: "Size", value: "1 KB" },
+      ],
+      groups: [
+        {
+          title: "文件信息",
+          fields: [{ label: "MIME", value: "image/jpeg" }],
+        },
+      ],
     },
     signals: [
       {

@@ -38,6 +38,17 @@ export function detectEditingSoftware(software: string | null): boolean {
   );
 }
 
+function metadataContainsAiFootprint(metadata: MetadataSummary): boolean {
+  const values = metadata.groups
+    .flatMap((group) => group.fields)
+    .map((field) => `${field.label} ${field.value}`)
+    .join(" ");
+
+  return /openai|gpt-?4o|dall[- ]?e|midjourney|stable diffusion|firefly|trainedalgorithmic|algorithmicmedia|digitalsourcetype/i.test(
+    values,
+  );
+}
+
 function buildSignals(
   metadata: MetadataSummary,
   provenance: ProvenanceSummary,
@@ -62,7 +73,7 @@ function buildSignals(
     error: "warn",
   };
 
-  return [
+  const signals: EvidenceSignal[] = [
     {
       id: "input",
       category: "input",
@@ -90,6 +101,31 @@ function buildSignals(
       detail: provenance.summary,
       source: "@contentauth/c2pa-web",
     },
+  ];
+
+  if (provenance.aiFootprint.status === "detected") {
+    signals.push({
+      id: "ai-footprint",
+      category: "provenance",
+      status: "risk",
+      weight: 35,
+      title: "AI 元信息线索",
+      detail: provenance.aiFootprint.signals.join("；"),
+      source: "C2PA assertions",
+    });
+  } else if (metadataContainsAiFootprint(metadata)) {
+    signals.push({
+      id: "ai-metadata-footprint",
+      category: "metadata",
+      status: "risk",
+      weight: 28,
+      title: "AI 元数据线索",
+      detail: "PNG/C2PA 容器中出现 AI 生成或 AI 处理相关可读字段。",
+      source: "PNG caBX metadata",
+    });
+  }
+
+  signals.push(
     {
       id: "hash",
       category: "hash",
@@ -110,7 +146,9 @@ function buildSignals(
         : `${fileFingerprint.perceptualHash?.slice(0, 16)}…`,
       source: "Canvas",
     },
-  ];
+  );
+
+  return signals;
 }
 
 function buildRiskScore(
@@ -150,6 +188,10 @@ function buildRiskScore(
     score -= 6;
   }
 
+  if (provenance.aiFootprint.status === "detected" || metadataContainsAiFootprint(metadata)) {
+    score += 45;
+  }
+
   if (fingerprintFailed) {
     score += 6;
   }
@@ -162,6 +204,10 @@ function buildSummary(
   provenance: ProvenanceSummary,
   metadata: MetadataSummary,
 ): string {
+  if (provenance.aiFootprint.status === "detected" || metadataContainsAiFootprint(metadata)) {
+    return "图片元信息中检测到 AI 生成或 AI 处理线索，建议按合成内容处理，并核对来源链路。";
+  }
+
   if (band === "low") {
     return provenance.status === "trusted" || provenance.status === "valid"
       ? "已检测到可验证来源线索，且当前未发现足够证据表明图像存在明显异常。"
@@ -241,4 +287,3 @@ export function buildQuickScanResult(input: {
     disclaimer: RISK_DISCLAIMER,
   };
 }
-

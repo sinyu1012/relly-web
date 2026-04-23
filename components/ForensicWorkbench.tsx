@@ -4,12 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 
 import { publicConfig } from "@/lib/config";
 import { submitAppealDraft } from "@/lib/appeal";
+import { createReportImageBlob } from "@/lib/reportImage";
 import { resolveRemoteImage, validateImageFile } from "@/lib/scan/file";
 import {
   createIdleProgress,
   runQuickScan as defaultRunQuickScan,
 } from "@/lib/scan/runQuickScan";
-import type { AppealDraft, ConsentState, QuickScanResult } from "@/lib/types";
+import type { AppealDraft, QuickScanResult } from "@/lib/types";
 
 import { AppealDrawer } from "./AppealDrawer";
 import styles from "./ForensicWorkbench.module.css";
@@ -25,12 +26,6 @@ type SelectedAsset = {
 type Props = {
   runQuickScan?: typeof defaultRunQuickScan;
   resolveRemoteAsset?: typeof resolveRemoteImage;
-};
-
-const defaultConsent: ConsentState = {
-  allowReverseSearch: false,
-  allowRetention: false,
-  forensicMode: false,
 };
 
 function isLikelyUrl(value: string): boolean {
@@ -52,6 +47,13 @@ function downloadJson(filename: string, payload: unknown) {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+function downloadBlob(filename: string, blobUrl: string) {
+  const anchor = document.createElement("a");
+  anchor.href = blobUrl;
+  anchor.download = filename;
+  anchor.click();
 }
 
 function buildFallbackHref(draft: AppealDraft): { href: string; label: string } {
@@ -91,8 +93,10 @@ export function ForensicWorkbench({
   const [scanError, setScanError] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState(createIdleProgress());
-  const consent: ConsentState = defaultConsent;
   const [result, setResult] = useState<QuickScanResult | null>(null);
+  const [reportImageUrl, setReportImageUrl] = useState("");
+  const [reportExportError, setReportExportError] = useState("");
+  const [isExportingReport, setIsExportingReport] = useState(false);
   const [appealOpen, setAppealOpen] = useState(false);
   const [appealNote, setAppealNote] = useState("");
   const [appealSourceUrl, setAppealSourceUrl] = useState("");
@@ -106,6 +110,14 @@ export function ForensicWorkbench({
       }
     };
   }, [selectedAsset]);
+
+  useEffect(() => {
+    return () => {
+      if (reportImageUrl) {
+        URL.revokeObjectURL(reportImageUrl);
+      }
+    };
+  }, [reportImageUrl]);
 
   useEffect(() => {
     const handlePaste = async (event: ClipboardEvent) => {
@@ -132,6 +144,8 @@ export function ForensicWorkbench({
           setUploadError("");
           setScanError("");
           setResult(null);
+          setReportImageUrl("");
+          setReportExportError("");
           setAppealMessage("");
           return;
         } catch (error) {
@@ -170,6 +184,8 @@ export function ForensicWorkbench({
       setUploadError("");
       setScanError("");
       setResult(null);
+      setReportImageUrl("");
+      setReportExportError("");
       setAppealNote("");
       setAppealSourceUrl("");
       setAppealOpen(false);
@@ -191,6 +207,8 @@ export function ForensicWorkbench({
     setUploadError("");
     setScanError("");
     setResult(null);
+    setReportImageUrl("");
+    setReportExportError("");
     setAppealNote("");
     setAppealSourceUrl("");
     setAppealOpen(false);
@@ -224,6 +242,8 @@ export function ForensicWorkbench({
     setIsScanning(true);
     setScanError("");
     setAppealMessage("");
+    setReportImageUrl("");
+    setReportExportError("");
 
     try {
       const nextResult = await runQuickScan({
@@ -241,20 +261,27 @@ export function ForensicWorkbench({
     }
   };
 
-  const reportPayload = useMemo(() => {
+  const handleExportReportImage = async () => {
     if (!result) {
-      return null;
+      return;
     }
 
-    return {
-      exportedAt: new Date().toISOString(),
-      consent,
-      result: {
-        ...result,
-        previewUrl: undefined,
-      },
-    };
-  }, [consent, result]);
+    setIsExportingReport(true);
+    setReportExportError("");
+
+    try {
+      const blob = await createReportImageBlob(result);
+      const nextReportUrl = URL.createObjectURL(blob);
+      setReportImageUrl(nextReportUrl);
+      downloadBlob(`${result.caseId.toLowerCase()}-report.png`, nextReportUrl);
+    } catch (error) {
+      setReportExportError(
+        error instanceof Error ? error.message : "图片报告生成失败，请重试。",
+      );
+    } finally {
+      setIsExportingReport(false);
+    }
+  };
 
   const appealDraft = useMemo<AppealDraft | null>(() => {
     if (!result) {
@@ -338,10 +365,11 @@ export function ForensicWorkbench({
 
           <ResultPanel
             result={result}
+            reportImageUrl={reportImageUrl}
+            reportExportError={reportExportError}
+            isExportingReport={isExportingReport}
             onExportReport={() => {
-              if (reportPayload && result) {
-                downloadJson(`${result.caseId.toLowerCase()}-report.json`, reportPayload);
-              }
+              void handleExportReportImage();
             }}
             onOpenAppeal={() => {
               setAppealOpen(true);

@@ -32,6 +32,16 @@ export interface FileFingerprint {
   perceptualHash: string | null;
 }
 
+export interface MetadataField {
+  label: string;
+  value: string;
+}
+
+export interface MetadataGroup {
+  title: string;
+  fields: MetadataField[];
+}
+
 export interface RedactedGps {
   present: boolean;
   redacted: boolean;
@@ -52,6 +62,8 @@ export interface MetadataSummary {
   hasXmp: boolean;
   gps: RedactedGps;
   note: string;
+  fields: MetadataField[];
+  groups: MetadataGroup[];
 }
 
 export type ProvenanceStatus =
@@ -61,6 +73,19 @@ export type ProvenanceStatus =
   | "invalid"
   | "error";
 
+export interface AiFootprintSummary {
+  status: "detected" | "not_detected" | "unknown";
+  model: string | null;
+  signals: string[];
+}
+
+export interface ProvenanceAction {
+  action: string;
+  when: string | null;
+  softwareAgent: string | null;
+  digitalSourceType: string | null;
+}
+
 export interface ProvenanceSummary {
   status: ProvenanceStatus;
   summary: string;
@@ -69,6 +94,12 @@ export interface ProvenanceSummary {
   generator: string | null;
   title: string | null;
   validationMessages: string[];
+  details: MetadataField[];
+  claimGeneratorInfo: MetadataField[];
+  signature: MetadataField[];
+  assertions: MetadataField[];
+  actions: ProvenanceAction[];
+  aiFootprint: AiFootprintSummary;
 }
 
 export interface QuickScanResult {
@@ -114,4 +145,3 @@ export interface RemoteImageResolveError extends Error {
     | "remote_fetch_failed"
     | "remote_fetch_blocked";
 }
-

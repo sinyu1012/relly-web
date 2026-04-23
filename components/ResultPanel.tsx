@@ -1,11 +1,14 @@
 "use client";
 
-import type { QuickScanResult } from "@/lib/types";
+import type { MetadataField, ProvenanceAction, QuickScanResult } from "@/lib/types";
 
 import styles from "./ResultPanel.module.css";
 
 type Props = {
   result: QuickScanResult | null;
+  reportImageUrl: string;
+  reportExportError: string;
+  isExportingReport: boolean;
   onExportReport: () => void;
   onOpenAppeal: () => void;
 };
@@ -17,7 +20,62 @@ const riskLabels: Record<QuickScanResult["riskBand"], string> = {
   high: "高风险",
 };
 
-export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
+const aiStatusLabels: Record<QuickScanResult["provenance"]["aiFootprint"]["status"], string> = {
+  detected: "检测到 AI 元信息",
+  not_detected: "未发现明确 AI 元信息",
+  unknown: "无法确认",
+};
+
+function FieldList({
+  fields,
+  emptyText = "暂无可展示字段。",
+}: {
+  fields: MetadataField[];
+  emptyText?: string;
+}) {
+  if (!fields.length) {
+    return <p className={styles.mutedText}>{emptyText}</p>;
+  }
+
+  return (
+    <dl className={styles.definitionList}>
+      {fields.map((field) => (
+        <div key={`${field.label}-${field.value}`}>
+          <dt>{field.label}</dt>
+          <dd>{field.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function ActionList({ actions }: { actions: ProvenanceAction[] }) {
+  if (!actions.length) {
+    return <p className={styles.mutedText}>未读取到 C2PA actions。</p>;
+  }
+
+  return (
+    <ol className={styles.actionList}>
+      {actions.map((action, index) => (
+        <li key={`${action.action}-${index}`}>
+          <strong>{action.action}</strong>
+          <span>{action.softwareAgent ?? "软件代理未声明"}</span>
+          <span>{action.digitalSourceType ?? "来源类型未声明"}</span>
+          {action.when ? <span>{action.when}</span> : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+export function ResultPanel({
+  result,
+  reportImageUrl,
+  reportExportError,
+  isExportingReport,
+  onExportReport,
+  onOpenAppeal,
+}: Props) {
   if (!result) {
     return (
       <section className={styles.panel} aria-labelledby="result-heading">
@@ -72,6 +130,12 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
             <span style={{ width: `${result.riskScore}%` }} />
           </div>
           <p className={styles.summaryText}>{result.summary}</p>
+          {result.provenance.aiFootprint.status === "detected" ? (
+            <p className={styles.aiNotice}>
+              {result.provenance.aiFootprint.model ?? "GenAI"} ·{" "}
+              {result.provenance.aiFootprint.signals[0]}
+            </p>
+          ) : null}
           <p className={styles.disclaimer}>{result.disclaimer}</p>
 
           <div className={styles.actionRow}>
@@ -79,8 +143,9 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
               type="button"
               className={styles.primaryButton}
               onClick={onExportReport}
+              disabled={isExportingReport}
             >
-              导出报告 JSON
+              {isExportingReport ? "生成中…" : "生成图片报告"}
             </button>
             <button
               type="button"
@@ -90,27 +155,40 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
               提交申诉
             </button>
           </div>
+
+          {reportExportError ? (
+            <p className={styles.errorText} role="alert">
+              {reportExportError}
+            </p>
+          ) : null}
         </div>
       </div>
 
+      {reportImageUrl ? (
+        <div className={styles.reportPreview}>
+          <div className={styles.reportPreviewHeader}>
+            <div>
+              <h3>图片报告</h3>
+              <p>已生成 PNG，可直接保存或转发。</p>
+            </div>
+            <a
+              className={styles.reportDownload}
+              download={`${result.caseId.toLowerCase()}-report.png`}
+              href={reportImageUrl}
+            >
+              保存图片
+            </a>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="图片报告预览" src={reportImageUrl} />
+        </div>
+      ) : null}
+
       <div className={styles.detailGrid}>
         <article className={styles.infoCard}>
-          <h3>来源凭证</h3>
+          <h3>内容凭证 / C2PA</h3>
           <p>{result.provenance.summary}</p>
-          <dl className={styles.definitionList}>
-            <div>
-              <dt>Validation</dt>
-              <dd>{result.provenance.validationState ?? "无"}</dd>
-            </div>
-            <div>
-              <dt>Manifest</dt>
-              <dd>{result.provenance.activeManifest ?? "无"}</dd>
-            </div>
-            <div>
-              <dt>Generator</dt>
-              <dd>{result.provenance.generator ?? "未声明"}</dd>
-            </div>
-          </dl>
+          <FieldList fields={result.provenance.details} />
           {result.provenance.validationMessages.length ? (
             <ul className={styles.messageList}>
               {result.provenance.validationMessages.map((message) => (
@@ -121,7 +199,33 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
         </article>
 
         <article className={styles.infoCard}>
-          <h3>元数据摘要</h3>
+          <h3>AI 元信息线索</h3>
+          <p
+            className={[
+              styles.aiStatus,
+              styles[`ai-${result.provenance.aiFootprint.status}`],
+            ].join(" ")}
+          >
+            {aiStatusLabels[result.provenance.aiFootprint.status]}
+          </p>
+          <FieldList
+            fields={[
+              {
+                label: "Model",
+                value: result.provenance.aiFootprint.model ?? "未声明",
+              },
+              ...result.provenance.aiFootprint.signals.map((signal, index) => ({
+                label: `Signal ${index + 1}`,
+                value: signal,
+              })),
+            ]}
+          />
+        </article>
+      </div>
+
+      <div className={styles.detailGrid}>
+        <article className={styles.infoCard}>
+          <h3>文件信息</h3>
           <dl className={styles.definitionList}>
             <div>
               <dt>格式</dt>
@@ -150,6 +254,43 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
           </dl>
           <p className={styles.metadataNote}>{result.metadata.note}</p>
         </article>
+
+        <article className={styles.infoCard}>
+          <h3>C2PA Actions</h3>
+          <ActionList actions={result.provenance.actions} />
+        </article>
+      </div>
+
+      <div className={styles.metadataSection}>
+        <h3>更多元数据</h3>
+        {result.provenance.claimGeneratorInfo.length ? (
+          <details className={styles.metadataGroup} open>
+            <summary>Claim Generator</summary>
+            <FieldList fields={result.provenance.claimGeneratorInfo} />
+          </details>
+        ) : null}
+        {result.provenance.signature.length ? (
+          <details className={styles.metadataGroup}>
+            <summary>Signature</summary>
+            <FieldList fields={result.provenance.signature} />
+          </details>
+        ) : null}
+        {result.provenance.assertions.length ? (
+          <details className={styles.metadataGroup}>
+            <summary>C2PA Assertions</summary>
+            <FieldList fields={result.provenance.assertions} />
+          </details>
+        ) : null}
+        {result.metadata.groups.map((group, index) => (
+          <details
+            className={styles.metadataGroup}
+            key={group.title}
+            open={index < 2}
+          >
+            <summary>{group.title}</summary>
+            <FieldList fields={group.fields} />
+          </details>
+        ))}
       </div>
 
       <div className={styles.signalSection}>

@@ -5,7 +5,7 @@ function isTruthy(value: string | undefined): boolean {
 }
 
 export const APP_NAME =
-  process.env.NEXT_PUBLIC_APP_NAME?.trim() || "真的吗";
+  process.env.NEXT_PUBLIC_APP_NAME?.trim() || "是真的吗";
 
 export const SUPPORTED_MIME_TYPES = [
   "image/jpeg",
@@ -28,4 +28,3 @@ export const serverConfig = {
   appealWebhookBearerToken:
     process.env.APPEAL_WEBHOOK_BEARER_TOKEN?.trim() || "",
 };
-

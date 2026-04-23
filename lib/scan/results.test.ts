@@ -15,6 +15,16 @@ const baseMetadata: MetadataSummary = {
   hasXmp: false,
   gps: { present: false, redacted: true },
   note: "检测到设备信息。",
+  fields: [
+    { label: "MIME", value: "image/jpeg" },
+    { label: "Size", value: "1 KB" },
+  ],
+  groups: [
+    {
+      title: "文件信息",
+      fields: [{ label: "MIME", value: "image/jpeg" }],
+    },
+  ],
 };
 
 const baseProvenance: ProvenanceSummary = {
@@ -25,6 +35,19 @@ const baseProvenance: ProvenanceSummary = {
   generator: "Camera",
   title: "example.jpg",
   validationMessages: [],
+  details: [
+    { label: "C2PA Status", value: "Trusted" },
+    { label: "Claim Generator", value: "Camera" },
+  ],
+  claimGeneratorInfo: [{ label: "Name", value: "Camera" }],
+  signature: [],
+  assertions: [],
+  actions: [],
+  aiFootprint: {
+    status: "not_detected",
+    model: null,
+    signals: ["C2PA 中暂未发现明确 AI 生成来源字段。"],
+  },
 };
 
 describe("riskBandFromScore", () => {
@@ -88,6 +111,39 @@ describe("buildQuickScanResult", () => {
 
     expect(["elevated", "high"]).toContain(result.riskBand);
     expect(result.signals.find((signal) => signal.id === "provenance")?.status).toBe(
+      "risk",
+    );
+  });
+
+  it("raises risk when C2PA contains AI footprint signals", () => {
+    const result = buildQuickScanResult({
+      fileName: "genai.png",
+      previewUrl: "blob:demo",
+      metadata: baseMetadata,
+      provenance: {
+        ...baseProvenance,
+        status: "valid",
+        validationState: "Valid",
+        generator: "OpenAI Media Service API",
+        aiFootprint: {
+          status: "detected",
+          model: "GPT-4o",
+          signals: [
+            "Digital Source Type: trainedAlgorithmicMedia",
+            "Software Agent: GPT-4o",
+          ],
+        },
+      },
+      fileFingerprint: {
+        sha256: "c".repeat(64),
+        perceptualHash: "f".repeat(16),
+      },
+      fingerprintFailed: false,
+    });
+
+    expect(["elevated", "high"]).toContain(result.riskBand);
+    expect(result.summary).toContain("AI");
+    expect(result.signals.find((signal) => signal.id === "ai-footprint")?.status).toBe(
       "risk",
     );
   });
