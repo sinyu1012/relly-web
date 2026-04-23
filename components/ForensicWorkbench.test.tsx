@@ -91,7 +91,7 @@ describe("ForensicWorkbench", () => {
       },
     });
 
-    await userEvent.click(screen.getByRole("button", { name: "开始本地快扫" }));
+    await userEvent.click(screen.getByRole("button", { name: "开始判断" }));
 
     await waitFor(() => {
       expect(runQuickScan).toHaveBeenCalled();

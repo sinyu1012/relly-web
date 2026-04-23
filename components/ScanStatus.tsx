@@ -21,7 +21,7 @@ export function ScanStatus({ progress, isScanning, scanError }: Props) {
     <section className={styles.panel} aria-labelledby="scan-heading">
       <div className={styles.panelHeader}>
         <div>
-          <p className={styles.eyebrow}>Step 03</p>
+          <p className={styles.eyebrow}>Step 02</p>
           <h2 id="scan-heading">本地快扫进度</h2>
         </div>
         <p className={styles.meta}>扫描流程按阶段执行，不会直接给出真假裁决。</p>
@@ -40,7 +40,7 @@ export function ScanStatus({ progress, isScanning, scanError }: Props) {
 
       <div className={styles.progressHeadline} aria-live="polite">
         <strong>{isScanning ? activeStage?.label : "等待开始"}</strong>
-        <span>{isScanning ? activeStage?.description : "选择图片后开始本地快扫。"}</span>
+        <span>{isScanning ? activeStage?.description : "选择图片后开始判断。"}</span>
       </div>
 
       <ol className={styles.stageList}>

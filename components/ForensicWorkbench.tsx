@@ -12,7 +12,6 @@ import {
 import type { AppealDraft, ConsentState, QuickScanResult } from "@/lib/types";
 
 import { AppealDrawer } from "./AppealDrawer";
-import { ConsentPanel } from "./ConsentPanel";
 import styles from "./ForensicWorkbench.module.css";
 import { ResultPanel } from "./ResultPanel";
 import { ScanStatus } from "./ScanStatus";
@@ -92,7 +91,7 @@ export function ForensicWorkbench({
   const [scanError, setScanError] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState(createIdleProgress());
-  const [consent, setConsent] = useState<ConsentState>(defaultConsent);
+  const consent: ConsentState = defaultConsent;
   const [result, setResult] = useState<QuickScanResult | null>(null);
   const [appealOpen, setAppealOpen] = useState(false);
   const [appealNote, setAppealNote] = useState("");
@@ -281,7 +280,7 @@ export function ForensicWorkbench({
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.heroEyebrow}>CHINESE-FIRST · MOBILE-FIRST · LOCAL</p>
-          <h1>上传一张图片，先在浏览器里做证据型快扫。</h1>
+          <h1>上传图片，判断真伪</h1>
           <p className={styles.heroText}>
             这个版本只整合本地可得证据：EXIF / XMP、Content Credentials、
             SHA-256 和基础图像指纹。结果用于核对来源，不替代人工判断。
@@ -319,13 +318,11 @@ export function ForensicWorkbench({
             onClearSelection={handleClearSelection}
           />
 
-          <ConsentPanel value={consent} onChange={setConsent} />
-
           <div className={styles.scanActionCard}>
             <div>
-              <p className={styles.scanActionEyebrow}>Step 03</p>
-              <h2>开始本地快扫</h2>
-              <p>不会上传图片；你开启的同意项在 v1 仅用于记录意图。</p>
+              <p className={styles.scanActionEyebrow}>Step 02</p>
+              <h2>开始判断</h2>
+              <p>不会上传图片；直接在浏览器里完成本地判断。</p>
             </div>
             <button
               type="button"
@@ -335,7 +332,7 @@ export function ForensicWorkbench({
               }}
               disabled={!selectedAsset || isScanning}
             >
-              {isScanning ? "快扫中…" : "开始本地快扫"}
+              {isScanning ? "判断中…" : "开始判断"}
             </button>
           </div>
 

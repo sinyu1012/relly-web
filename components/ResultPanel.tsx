@@ -23,14 +23,14 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
       <section className={styles.panel} aria-labelledby="result-heading">
         <div className={styles.panelHeader}>
           <div>
-            <p className={styles.eyebrow}>Step 04</p>
+            <p className={styles.eyebrow}>Step 03</p>
             <h2 id="result-heading">结果页</h2>
           </div>
           <p className={styles.meta}>快扫完成后，这里会展示风险带、证据项和建议动作。</p>
         </div>
         <div className={styles.emptyState}>
           <span>RESULT PENDING</span>
-          <p>还没有本地结果。上传图片并开始快扫后，会在这里生成证据型报告。</p>
+          <p>还没有本地结果。上传图片并开始判断后，会在这里生成证据型报告。</p>
         </div>
       </section>
     );
@@ -40,7 +40,7 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
     <section className={styles.panel} aria-labelledby="result-heading">
       <div className={styles.panelHeader}>
         <div>
-          <p className={styles.eyebrow}>Step 04</p>
+          <p className={styles.eyebrow}>Step 03</p>
           <h2 id="result-heading">结果页</h2>
         </div>
         <p className={styles.meta}>case ID：{result.caseId}</p>
@@ -189,4 +189,3 @@ export function ResultPanel({ result, onExportReport, onOpenAppeal }: Props) {
     </section>
   );
 }
-
