@@ -202,7 +202,7 @@ export async function createReportImageBlob(result: QuickScanResult): Promise<Bl
   ctx.fillStyle = COLORS.text;
   ctx.font =
     "700 58px -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif";
-  ctx.fillText("是真的吗", 76, 120);
+  ctx.fillText("求真", 76, 120);
   ctx.font = "22px Menlo, Consolas, monospace";
   ctx.fillStyle = COLORS.muted;
   ctx.fillText("LOCAL EVIDENCE REPORT", 80, 162);

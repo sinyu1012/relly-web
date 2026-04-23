@@ -94,24 +94,12 @@ const mockAiImageAnalysis: AiImageAnalysisResult = {
 };
 
 describe("ForensicWorkbench", () => {
-  it("shows a friendly URL fallback message when remote fetching is blocked", async () => {
-    const user = userEvent.setup();
-    const resolveRemoteAsset = vi.fn().mockRejectedValue(
-      new Error("目标站点不允许跨域读取，请先下载图片再上传本地文件。"),
-    );
+  it("keeps the upload step focused on local images", () => {
+    render(<ForensicWorkbench />);
 
-    render(<ForensicWorkbench resolveRemoteAsset={resolveRemoteAsset} />);
-
-    await user.type(
-      screen.getByPlaceholderText("https://example.com/image.jpg"),
-      "https://example.com/test.jpg",
-    );
-    await user.click(screen.getByRole("button", { name: "读取 URL" }));
-
-    expect(resolveRemoteAsset).toHaveBeenCalled();
-    expect(
-      await screen.findByText("目标站点不允许跨域读取，请先下载图片再上传本地文件。"),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "上传图片" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "读取 URL" })).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("https://example.com/image.jpg")).not.toBeInTheDocument();
   });
 
   it("runs the mocked scan flow and renders the result summary", async () => {
@@ -179,9 +167,11 @@ describe("ForensicWorkbench", () => {
       });
     });
 
+    expect(await screen.findByText("AI 图片分析结果")).toBeInTheDocument();
+    expect(await screen.findByText("AI 图片分析详情")).toBeInTheDocument();
     expect(
-      await screen.findByText("AI 视觉分析发现画面存在不自然边缘和文字伪影，建议核对来源。"),
-    ).toBeInTheDocument();
+      await screen.findAllByText("AI 视觉分析发现画面存在不自然边缘和文字伪影，建议核对来源。"),
+    ).toHaveLength(2);
     expect(screen.getByText("局部文字和边缘过渡不自然，可能来自合成或二次编辑。")).toBeInTheDocument();
   });
 });

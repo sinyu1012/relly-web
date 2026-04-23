@@ -214,6 +214,35 @@
   overflow-wrap: anywhere;
 }
 
+.aiInlineResult {
+  margin-top: 16px;
+  border: 1px solid var(--accent);
+  background: rgba(77, 163, 255, 0.1);
+  padding: 14px;
+  min-width: 0;
+}
+
+.aiInlineTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.aiInlineTopline span {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.aiInlineResult p {
+  margin: 10px 0 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .definitionList {
   display: grid;
   gap: 10px;
@@ -344,7 +373,7 @@
 
 .aiAnalysisPanel {
   margin-top: 16px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--accent);
   background: var(--surface-raised);
   padding: 16px;
   min-width: 0;
@@ -371,6 +400,15 @@
 .aiAnalysisHeader p {
   margin: 6px 0 0;
   color: var(--text-muted);
+}
+
+.aiAnalysisHeader .aiAnalysisEyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .aiAnalysisScore {
@@ -575,6 +613,11 @@
   .actionRow {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .aiInlineTopline {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .primaryButton,

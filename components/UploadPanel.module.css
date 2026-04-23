@@ -32,8 +32,7 @@
   text-transform: uppercase;
 }
 
-.meta,
-.helpText {
+.meta {
   margin: 0;
   color: var(--text-muted);
   overflow-wrap: anywhere;
@@ -161,37 +160,6 @@
   letter-spacing: 0.16em;
 }
 
-.remoteRow {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  min-width: 0;
-}
-
-.remoteField {
-  flex: 1;
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.remoteField span {
-  color: var(--text-muted);
-}
-
-.remoteField input {
-  min-height: 44px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  color: var(--text);
-  padding: 0 12px;
-  min-width: 0;
-}
-
-.helpText {
-  margin-top: 12px;
-}
-
 .errorText {
   margin: 12px 0 0;
   padding: 12px;
@@ -207,10 +175,6 @@
 
   .dropzone {
     grid-template-columns: 1fr;
-  }
-
-  .remoteRow {
-    flex-direction: column;
   }
 
   .previewImage {
@@ -232,7 +196,4 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .remoteRow > .secondaryButton {
-    width: 100%;
-  }
 }

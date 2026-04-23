@@ -10,11 +10,8 @@ type Props = {
   selectedFileName: string | null;
   selectedFileSize: number | null;
   previewUrl: string | null;
-  remoteUrl: string;
   uploadError: string;
-  onRemoteUrlChange: (value: string) => void;
   onFileSelected: (file: File) => void;
-  onResolveRemoteUrl: () => Promise<void>;
   onClearSelection: () => void;
 };
 
@@ -22,11 +19,8 @@ export function UploadPanel({
   selectedFileName,
   selectedFileSize,
   previewUrl,
-  remoteUrl,
   uploadError,
-  onRemoteUrlChange,
   onFileSelected,
-  onResolveRemoteUrl,
   onClearSelection,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,10 +31,10 @@ export function UploadPanel({
       <div className={styles.panelHeader}>
         <div>
           <p className={styles.eyebrow}>Step 01</p>
-          <h2 id="upload-heading">上传或读取图片</h2>
+          <h2 id="upload-heading">上传图片</h2>
         </div>
         <p className={styles.meta}>
-          支持点击选择、拖拽上传、粘贴图片，或输入公开 URL。
+          支持点击选择、拖拽上传或粘贴图片。
         </p>
       </div>
 
@@ -125,31 +119,6 @@ export function UploadPanel({
         </div>
       </div>
 
-      <div className={styles.remoteRow}>
-        <label className={styles.remoteField}>
-          <span>公开图片 URL</span>
-          <input
-            type="url"
-            placeholder="https://example.com/image.jpg"
-            value={remoteUrl}
-            onChange={(event) => onRemoteUrlChange(event.target.value)}
-          />
-        </label>
-        <button
-          type="button"
-          className={styles.secondaryButton}
-          onClick={() => {
-            void onResolveRemoteUrl();
-          }}
-        >
-          读取 URL
-        </button>
-      </div>
-
-      <p className={styles.helpText}>
-        如果目标站点阻止跨域读取，本工具会提示你先下载到本地后再上传。
-      </p>
-
       {uploadError ? (
         <p className={styles.errorText} role="alert">
           {uploadError}
@@ -158,4 +127,3 @@ export function UploadPanel({
     </section>
   );
 }
-

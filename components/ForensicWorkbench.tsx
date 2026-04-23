@@ -6,7 +6,7 @@ import { analyzeImageWithAi as defaultAnalyzeImage } from "@/lib/aiDetection";
 import { publicConfig } from "@/lib/config";
 import { submitAppealDraft } from "@/lib/appeal";
 import { createReportImageBlob } from "@/lib/reportImage";
-import { resolveRemoteImage, validateImageFile } from "@/lib/scan/file";
+import { validateImageFile } from "@/lib/scan/file";
 import {
   createIdleProgress,
   runQuickScan as defaultRunQuickScan,
@@ -26,18 +26,8 @@ type SelectedAsset = {
 
 type Props = {
   runQuickScan?: typeof defaultRunQuickScan;
-  resolveRemoteAsset?: typeof resolveRemoteImage;
   analyzeImage?: typeof defaultAnalyzeImage;
 };
-
-function isLikelyUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
 
 function downloadJson(filename: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -87,11 +77,9 @@ function buildFallbackHref(draft: AppealDraft): { href: string; label: string } 
 
 export function ForensicWorkbench({
   runQuickScan = defaultRunQuickScan,
-  resolveRemoteAsset = resolveRemoteImage,
   analyzeImage = defaultAnalyzeImage,
 }: Props) {
   const [selectedAsset, setSelectedAsset] = useState<SelectedAsset | null>(null);
-  const [remoteUrl, setRemoteUrl] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [scanError, setScanError] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -164,10 +152,6 @@ export function ForensicWorkbench({
         }
       }
 
-      const pastedText = event.clipboardData?.getData("text/plain")?.trim();
-      if (pastedText && isLikelyUrl(pastedText)) {
-        setRemoteUrl(pastedText);
-      }
     };
 
     window.addEventListener("paste", handlePaste);
@@ -225,24 +209,6 @@ export function ForensicWorkbench({
     setAiImageAnalysis(null);
     setAiImageAnalysisError("");
     setProgress(createIdleProgress());
-  };
-
-  const handleResolveRemoteUrl = async () => {
-    setUploadError("");
-
-    if (!remoteUrl.trim()) {
-      setUploadError("请先输入公开图片 URL。");
-      return;
-    }
-
-    try {
-      const file = await resolveRemoteAsset(remoteUrl.trim());
-      handleFileSelected(file);
-    } catch (error) {
-      setUploadError(
-        error instanceof Error ? error.message : "远程图片读取失败。",
-      );
-    }
   };
 
   const handleStartScan = async () => {
@@ -375,11 +341,8 @@ export function ForensicWorkbench({
             selectedFileName={selectedAsset?.file.name ?? null}
             selectedFileSize={selectedAsset?.file.size ?? null}
             previewUrl={selectedAsset?.previewUrl ?? null}
-            remoteUrl={remoteUrl}
             uploadError={uploadError}
-            onRemoteUrlChange={setRemoteUrl}
             onFileSelected={handleFileSelected}
-            onResolveRemoteUrl={handleResolveRemoteUrl}
             onClearSelection={handleClearSelection}
           />
         </div>

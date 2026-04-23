@@ -5,7 +5,7 @@ function isTruthy(value: string | undefined): boolean {
 }
 
 export const APP_NAME =
-  process.env.NEXT_PUBLIC_APP_NAME?.trim() || "是真的吗";
+  process.env.NEXT_PUBLIC_APP_NAME?.trim() || "求真";
 
 export const SUPPORTED_MIME_TYPES = [
   "image/jpeg",

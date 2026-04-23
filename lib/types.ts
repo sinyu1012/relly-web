@@ -155,11 +155,3 @@ export interface QuickScanProgress {
   currentStageId: string;
   stages: ScanStage[];
 }
-
-export interface RemoteImageResolveError extends Error {
-  code:
-    | "unsupported_type"
-    | "file_too_large"
-    | "remote_fetch_failed"
-    | "remote_fetch_blocked";
-}
