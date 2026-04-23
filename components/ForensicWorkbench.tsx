@@ -311,7 +311,7 @@ export function ForensicWorkbench({
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.heroEyebrow}>CHINESE-FIRST · MOBILE-FIRST · LOCAL</p>
-          <h1>上传图片，判断真伪</h1>
+          <h1>选择图片，判断真伪</h1>
           <p className={styles.heroText}>
             这个版本只整合本地可得证据：EXIF / XMP、Content Credentials、
             SHA-256 和基础图像指纹。结果用于核对来源，不替代人工判断。

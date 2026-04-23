@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Really">
+  <rect width="512" height="512" fill="#0a0a0a" rx="56" />
+  <rect
+    x="24"
+    y="24"
+    width="464"
+    height="464"
+    rx="42"
+    fill="none"
+    stroke="#f5f5f5"
+    stroke-width="16"
+  />
+  <path
+    d="M106 304V132h270v124"
+    fill="none"
+    stroke="#f5f5f5"
+    stroke-linecap="square"
+    stroke-width="18"
+  />
+  <path
+    d="M106 304l92-116 62 80 36-44 23 31"
+    fill="none"
+    stroke="#f5f5f5"
+    stroke-linecap="square"
+    stroke-linejoin="miter"
+    stroke-width="18"
+  />
+  <circle cx="151" cy="165" r="20" fill="#ffd400" />
+  <path
+    d="M303 151h52v52"
+    fill="none"
+    stroke="#4da3ff"
+    stroke-linecap="square"
+    stroke-width="12"
+  />
+  <circle
+    cx="325"
+    cy="306"
+    r="74"
+    fill="#0a0a0a"
+    stroke="#f5f5f5"
+    stroke-width="18"
+  />
+  <path
+    d="M378 359l61 61"
+    fill="none"
+    stroke="#f5f5f5"
+    stroke-linecap="square"
+    stroke-width="22"
+  />
+  <text
+    x="325"
+    y="340"
+    fill="#f5f5f5"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="102"
+    font-weight="700"
+    text-anchor="middle"
+  >?</text>
+</svg>

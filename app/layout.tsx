@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   title: `${APP_NAME} · 本地图片快扫`,
   description:
     "上传一张图片，先在本地检查，再决定是否补充更多来源信息。",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: ["/icon.svg"],
+  },
 };
 
 export const viewport: Viewport = {
