@@ -117,6 +117,24 @@ export interface QuickScanResult {
   disclaimer: string;
 }
 
+export interface ClaimAnalysisCheck {
+  label: string;
+  status: EvidenceStatus;
+  detail: string;
+}
+
+export interface ClaimAnalysisResult {
+  claimRiskScore: number;
+  riskBand: RiskBand;
+  summary: string;
+  findings: string[];
+  checks: ClaimAnalysisCheck[];
+  nextActions: string[];
+  model: string;
+  analyzedAt: string;
+  disclaimer: string;
+}
+
 export interface AppealDraft {
   caseId: string;
   note: string;

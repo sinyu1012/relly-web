@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ForensicWorkbench } from "@/components/ForensicWorkbench";
-import type { QuickScanResult } from "@/lib/types";
+import type { ClaimAnalysisResult, QuickScanResult } from "@/lib/types";
 
 function buildMockResult(previewUrl: string): QuickScanResult {
   return {
@@ -75,6 +75,24 @@ function buildMockResult(previewUrl: string): QuickScanResult {
   };
 }
 
+const mockClaimAnalysis: ClaimAnalysisResult = {
+  claimRiskScore: 82,
+  riskBand: "high",
+  summary: "配文包含极端数字和缺少来源的强主张，建议先核对权威通报。",
+  findings: ["出现 9.8 级地震这类极端数字，但未提供可核查来源。"],
+  checks: [
+    {
+      label: "数字合理性",
+      status: "risk",
+      detail: "极端灾害数字需要权威机构或可靠来源支撑。",
+    },
+  ],
+  nextActions: ["核对官方通报或可靠媒体来源。"],
+  model: "test-model",
+  analyzedAt: "2026-04-23T00:00:00.000Z",
+  disclaimer: "AI 辅助核查只评估配文和主张的可疑程度。",
+};
+
 describe("ForensicWorkbench", () => {
   it("shows a friendly URL fallback message when remote fetching is blocked", async () => {
     const user = userEvent.setup();
@@ -123,5 +141,50 @@ describe("ForensicWorkbench", () => {
     expect(
       screen.getByText("本结果用于来源核对与风险提示，不构成法律、新闻或平台治理上的最终结论。"),
     ).toBeInTheDocument();
+  });
+
+  it("runs AI claim analysis through the injected server-proxy helper", async () => {
+    const runQuickScan = vi.fn().mockImplementation(async ({ previewUrl }) =>
+      buildMockResult(previewUrl),
+    );
+    const analyzeClaim = vi.fn().mockResolvedValue(mockClaimAnalysis);
+
+    const { container } = render(
+      <ForensicWorkbench
+        runQuickScan={runQuickScan}
+        analyzeClaim={analyzeClaim}
+      />,
+    );
+    const fileInput = container.querySelector('input[type="file"]');
+
+    fireEvent.change(fileInput as HTMLInputElement, {
+      target: {
+        files: [new File(["demo"], "demo.jpg", { type: "image/jpeg" })],
+      },
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: "开始判断" }));
+    await screen.findByText("当前证据有限，建议补充原始文件或更多上下文再判断。");
+
+    await userEvent.type(
+      screen.getByPlaceholderText("例如：这张图说某地今晚发生 9.8 级地震，官方不让说。"),
+      "这张图说某地今晚发生 9.8 级地震，官方不让说。",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "AI 辅助核查" }));
+
+    await waitFor(() => {
+      expect(analyzeClaim).toHaveBeenCalledWith({
+        claimText: "这张图说某地今晚发生 9.8 级地震，官方不让说。",
+        result: expect.objectContaining({
+          caseId: "CASE-ABC123456789",
+          riskBand: "uncertain",
+        }),
+      });
+    });
+
+    expect(
+      await screen.findByText("配文包含极端数字和缺少来源的强主张，建议先核对权威通报。"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("极端灾害数字需要权威机构或可靠来源支撑。")).toBeInTheDocument();
   });
 });

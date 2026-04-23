@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { analyzeClaimWithAi as defaultAnalyzeClaim } from "@/lib/aiDetection";
 import { publicConfig } from "@/lib/config";
 import { submitAppealDraft } from "@/lib/appeal";
 import { createReportImageBlob } from "@/lib/reportImage";
@@ -10,7 +11,7 @@ import {
   createIdleProgress,
   runQuickScan as defaultRunQuickScan,
 } from "@/lib/scan/runQuickScan";
-import type { AppealDraft, QuickScanResult } from "@/lib/types";
+import type { AppealDraft, ClaimAnalysisResult, QuickScanResult } from "@/lib/types";
 
 import { AppealDrawer } from "./AppealDrawer";
 import styles from "./ForensicWorkbench.module.css";
@@ -26,6 +27,22 @@ type SelectedAsset = {
 type Props = {
   runQuickScan?: typeof defaultRunQuickScan;
   resolveRemoteAsset?: typeof resolveRemoteImage;
+  analyzeClaim?: typeof defaultAnalyzeClaim;
+};
+
+const riskLabels: Record<ClaimAnalysisResult["riskBand"], string> = {
+  low: "低风险",
+  uncertain: "不确定",
+  elevated: "偏高风险",
+  high: "高风险",
+};
+
+const checkStatusLabels: Record<string, string> = {
+  pass: "通过",
+  info: "提示",
+  warn: "注意",
+  risk: "风险",
+  error: "错误",
 };
 
 function isLikelyUrl(value: string): boolean {
@@ -86,6 +103,7 @@ function buildFallbackHref(draft: AppealDraft): { href: string; label: string } 
 export function ForensicWorkbench({
   runQuickScan = defaultRunQuickScan,
   resolveRemoteAsset = resolveRemoteImage,
+  analyzeClaim = defaultAnalyzeClaim,
 }: Props) {
   const [selectedAsset, setSelectedAsset] = useState<SelectedAsset | null>(null);
   const [remoteUrl, setRemoteUrl] = useState("");
@@ -102,6 +120,10 @@ export function ForensicWorkbench({
   const [appealSourceUrl, setAppealSourceUrl] = useState("");
   const [appealMessage, setAppealMessage] = useState("");
   const [isSubmittingAppeal, setIsSubmittingAppeal] = useState(false);
+  const [claimText, setClaimText] = useState("");
+  const [claimAnalysis, setClaimAnalysis] = useState<ClaimAnalysisResult | null>(null);
+  const [claimAnalysisError, setClaimAnalysisError] = useState("");
+  const [isAnalyzingClaim, setIsAnalyzingClaim] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -147,6 +169,8 @@ export function ForensicWorkbench({
           setReportImageUrl("");
           setReportExportError("");
           setAppealMessage("");
+          setClaimAnalysis(null);
+          setClaimAnalysisError("");
           return;
         } catch (error) {
           setUploadError(
@@ -190,6 +214,8 @@ export function ForensicWorkbench({
       setAppealSourceUrl("");
       setAppealOpen(false);
       setAppealMessage("");
+      setClaimAnalysis(null);
+      setClaimAnalysisError("");
     } catch (error) {
       setUploadError(
         error instanceof Error ? error.message : "当前文件无法读取。",
@@ -212,6 +238,8 @@ export function ForensicWorkbench({
     setAppealNote("");
     setAppealSourceUrl("");
     setAppealOpen(false);
+    setClaimAnalysis(null);
+    setClaimAnalysisError("");
     setProgress(createIdleProgress());
   };
 
@@ -244,6 +272,8 @@ export function ForensicWorkbench({
     setAppealMessage("");
     setReportImageUrl("");
     setReportExportError("");
+    setClaimAnalysis(null);
+    setClaimAnalysisError("");
 
     try {
       const nextResult = await runQuickScan({
@@ -258,6 +288,32 @@ export function ForensicWorkbench({
       );
     } finally {
       setIsScanning(false);
+    }
+  };
+
+  const handleAnalyzeClaim = async () => {
+    const normalizedClaimText = claimText.trim();
+
+    if (!normalizedClaimText) {
+      setClaimAnalysisError("请先输入需要核查的配文或消息。");
+      return;
+    }
+
+    setIsAnalyzingClaim(true);
+    setClaimAnalysisError("");
+
+    try {
+      const analysis = await analyzeClaim({
+        claimText: normalizedClaimText,
+        result,
+      });
+      setClaimAnalysis(analysis);
+    } catch (error) {
+      setClaimAnalysisError(
+        error instanceof Error ? error.message : "AI 辅助核查失败，请稍后重试。",
+      );
+    } finally {
+      setIsAnalyzingClaim(false);
     }
   };
 
@@ -387,6 +443,103 @@ export function ForensicWorkbench({
             }}
           />
         </div>
+
+        <section className={styles.claimSlot} aria-labelledby="claim-heading">
+          <div className={styles.claimHeader}>
+            <div>
+              <p className={styles.scanActionEyebrow}>Step 04</p>
+              <h2 id="claim-heading">AI 辅助核查配文</h2>
+            </div>
+            <span className={styles.claimMode}>服务端代理</span>
+          </div>
+
+          <p className={styles.claimIntro}>
+            粘贴转发语、标题或聊天截图文字。只发送这段文字和本地结果摘要，不上传原图。
+          </p>
+
+          <textarea
+            className={styles.claimTextarea}
+            maxLength={4000}
+            value={claimText}
+            onChange={(event) => {
+              setClaimText(event.target.value);
+              setClaimAnalysisError("");
+            }}
+            placeholder="例如：这张图说某地今晚发生 9.8 级地震，官方不让说。"
+          />
+
+          <div className={styles.claimActions}>
+            <button
+              type="button"
+              className={styles.claimButton}
+              disabled={!claimText.trim() || isAnalyzingClaim}
+              onClick={() => {
+                void handleAnalyzeClaim();
+              }}
+            >
+              {isAnalyzingClaim ? "核查中…" : "AI 辅助核查"}
+            </button>
+            <span>{claimText.length} / 4000</span>
+          </div>
+
+          {claimAnalysisError ? (
+            <p className={styles.claimError} role="alert">
+              {claimAnalysisError}
+            </p>
+          ) : null}
+
+          {claimAnalysis ? (
+            <div className={styles.claimResult}>
+              <div className={styles.claimResultTopline}>
+                <span
+                  className={[
+                    styles.claimRiskPill,
+                    styles[`claimRisk-${claimAnalysis.riskBand}`],
+                  ].join(" ")}
+                >
+                  {riskLabels[claimAnalysis.riskBand]}
+                </span>
+                <strong>{claimAnalysis.claimRiskScore} / 100</strong>
+              </div>
+              <p className={styles.claimSummary}>{claimAnalysis.summary}</p>
+
+              <div className={styles.claimResultGrid}>
+                <div>
+                  <h3>主要发现</h3>
+                  <ul className={styles.claimList}>
+                    {claimAnalysis.findings.map((finding) => (
+                      <li key={finding}>{finding}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3>核查建议</h3>
+                  <ul className={styles.claimList}>
+                    {claimAnalysis.nextActions.map((action) => (
+                      <li key={action}>{action}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className={styles.claimChecks}>
+                {claimAnalysis.checks.map((check) => (
+                  <div key={`${check.label}-${check.detail}`}>
+                    <span className={styles[`check-${check.status}`]}>
+                      {checkStatusLabels[check.status] ?? check.status}
+                    </span>
+                    <strong>{check.label}</strong>
+                    <p>{check.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className={styles.claimDisclaimer}>
+                {claimAnalysis.disclaimer} 模型：{claimAnalysis.model}
+              </p>
+            </div>
+          ) : null}
+        </section>
       </div>
 
       <AppealDrawer
