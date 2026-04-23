@@ -2,7 +2,12 @@ import type { AiImageAnalysisResult, MetadataField, QuickScanResult } from "@/li
 
 const REPORT_WIDTH = 1200;
 const REPORT_HEIGHT = 1850;
-const REPORT_HEIGHT_WITH_AI = 2320;
+const REPORT_HEIGHT_WITH_AI = 2500;
+const AI_SECTION_TOP = 930;
+const AI_SECTION_HEIGHT = 520;
+const SECTION_GAP = 50;
+const EVIDENCE_HEIGHT = 500;
+const NOTE_HEIGHT = 180;
 
 const COLORS = {
   bg: "#0A0A0A",
@@ -147,7 +152,7 @@ function drawBulletList(
     ctx.font =
       "22px -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif";
     ctx.fillStyle = COLORS.muted;
-    nextY = drawWrappedText(ctx, item, x + 28, nextY, width - 28, 30, 2) + 12;
+    nextY = drawWrappedText(ctx, item, x + 28, nextY, width - 28, 30, 2) + 16;
   }
 
   return nextY;
@@ -212,11 +217,10 @@ function drawAiAnalysisSection(
   aiImageAnalysis: AiImageAnalysisResult,
   top: number,
 ) {
-  const height = 350;
   ctx.fillStyle = COLORS.surface;
-  ctx.fillRect(76, top, 1048, height);
+  ctx.fillRect(76, top, 1048, AI_SECTION_HEIGHT);
   ctx.strokeStyle = COLORS.accent;
-  ctx.strokeRect(76, top, 1048, height);
+  ctx.strokeRect(76, top, 1048, AI_SECTION_HEIGHT);
 
   ctx.font = "700 30px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
   ctx.fillStyle = COLORS.text;
@@ -252,16 +256,23 @@ function drawAiAnalysisSection(
   ctx.font = "700 22px Menlo, Consolas, monospace";
   ctx.fillStyle = COLORS.accent;
   ctx.fillText("FINDINGS", 112, summaryBottom + 34);
-  drawBulletList(
+  const findingItems = aiImageAnalysis.findings.length
+    ? aiImageAnalysis.findings
+    : aiImageAnalysis.checks.map((check) => check.detail);
+  const findingsBottom = drawBulletList(
     ctx,
-    aiImageAnalysis.findings.length
-      ? aiImageAnalysis.findings
-      : aiImageAnalysis.checks.map((check) => check.detail),
+    findingItems,
     112,
     summaryBottom + 74,
     960,
     3,
   );
+
+  if (findingItems.length > 3 && findingsBottom < top + AI_SECTION_HEIGHT - 44) {
+    ctx.font = "21px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
+    ctx.fillStyle = COLORS.muted;
+    ctx.fillText("更多 AI 发现已在页面详情中展示。", 112, top + AI_SECTION_HEIGHT - 34);
+  }
 }
 
 export async function createReportImageBlob(
@@ -367,16 +378,17 @@ export async function createReportImageBlob(
   );
 
   if (aiImageAnalysis) {
-    drawAiAnalysisSection(ctx, aiImageAnalysis, 930);
+    drawAiAnalysisSection(ctx, aiImageAnalysis, AI_SECTION_TOP);
   }
 
-  const evidenceTop = aiImageAnalysis ? 1360 : 930;
-  const evidenceHeight = 500;
-  const evidenceBottom = evidenceTop + evidenceHeight - 34;
+  const evidenceTop = aiImageAnalysis
+    ? AI_SECTION_TOP + AI_SECTION_HEIGHT + SECTION_GAP
+    : 930;
+  const evidenceBottom = evidenceTop + EVIDENCE_HEIGHT - 34;
   ctx.fillStyle = COLORS.surface;
-  ctx.fillRect(76, evidenceTop, 1048, evidenceHeight);
+  ctx.fillRect(76, evidenceTop, 1048, EVIDENCE_HEIGHT);
   ctx.strokeStyle = COLORS.border;
-  ctx.strokeRect(76, evidenceTop, 1048, evidenceHeight);
+  ctx.strokeRect(76, evidenceTop, 1048, EVIDENCE_HEIGHT);
   ctx.font = "700 30px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
   ctx.fillStyle = COLORS.text;
   ctx.fillText("证据项", 112, evidenceTop + 60);
@@ -413,11 +425,11 @@ export async function createReportImageBlob(
     }
   }
 
-  const noteTop = aiImageAnalysis ? 1910 : 1480;
+  const noteTop = evidenceTop + EVIDENCE_HEIGHT + SECTION_GAP;
   ctx.fillStyle = COLORS.surface;
-  ctx.fillRect(76, noteTop, 1048, 180);
+  ctx.fillRect(76, noteTop, 1048, NOTE_HEIGHT);
   ctx.strokeStyle = COLORS.border;
-  ctx.strokeRect(76, noteTop, 1048, 180);
+  ctx.strokeRect(76, noteTop, 1048, NOTE_HEIGHT);
   ctx.font = "700 28px -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif";
   ctx.fillStyle = COLORS.text;
   ctx.fillText("说明", 112, noteTop + 56);
