@@ -25,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -33,10 +34,18 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   text-wrap: pretty;
+  overflow-x: hidden;
 }
 
 a {
   color: inherit;
+}
+
+img,
+canvas,
+video,
+svg {
+  max-width: 100%;
 }
 
 button,

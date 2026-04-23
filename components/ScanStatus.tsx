@@ -11,18 +11,33 @@ type Props = {
 };
 
 export function ScanStatus({ progress, isScanning, scanError }: Props) {
+  const hasCompleted = progress.stages.every((stage) => stage.state === "done");
   const activeStage =
     progress.stages.find((stage) => stage.state === "active") ??
     progress.stages.find((stage) => stage.id === progress.currentStageId) ??
     progress.stages[0];
-  const progressValue = isScanning ? activeStage?.progress ?? 0 : 0;
+  const progressValue = isScanning
+    ? activeStage?.progress ?? 0
+    : hasCompleted
+      ? 100
+      : 0;
+  const headline = isScanning
+    ? activeStage?.label ?? "判断中"
+    : hasCompleted
+      ? "判断完成"
+      : "等待开始";
+  const headlineDescription = isScanning
+    ? activeStage?.description ?? "正在执行本地判断。"
+    : hasCompleted
+      ? "结果已生成，可继续查看证据项或导出图片报告。"
+      : "选择图片后开始判断。";
 
   return (
     <section className={styles.panel} aria-labelledby="scan-heading">
       <div className={styles.panelHeader}>
         <div>
           <p className={styles.eyebrow}>Step 02</p>
-          <h2 id="scan-heading">本地快扫进度</h2>
+          <h2 id="scan-heading">判断进度</h2>
         </div>
         <p className={styles.meta}>扫描流程按阶段执行，不会直接给出真假裁决。</p>
       </div>
@@ -39,8 +54,8 @@ export function ScanStatus({ progress, isScanning, scanError }: Props) {
       </div>
 
       <div className={styles.progressHeadline} aria-live="polite">
-        <strong>{isScanning ? activeStage?.label : "等待开始"}</strong>
-        <span>{isScanning ? activeStage?.description : "选择图片后开始判断。"}</span>
+        <strong>{headline}</strong>
+        <span>{headlineDescription}</span>
       </div>
 
       <ol className={styles.stageList}>

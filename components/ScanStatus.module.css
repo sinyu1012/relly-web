@@ -4,6 +4,8 @@
   border: 1px solid var(--border-strong);
   background: var(--surface);
   padding: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .panelHeader {
@@ -29,6 +31,7 @@
 .meta {
   margin: 0;
   color: var(--text-muted);
+  overflow-wrap: anywhere;
 }
 
 .progressRail {
@@ -57,6 +60,7 @@
 
 .progressHeadline span {
   color: var(--text-muted);
+  overflow-wrap: anywhere;
 }
 
 .stageList {
@@ -74,6 +78,7 @@
   padding: 12px;
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
+  min-width: 0;
 }
 
 .stageActive {
@@ -101,6 +106,11 @@
 
 .stageItem p {
   margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.stageItem div {
+  min-width: 0;
 }
 
 .errorText {
@@ -117,3 +127,18 @@
   }
 }
 
+@media (max-width: 520px) {
+  .panel {
+    padding: 14px;
+  }
+
+  .stageItem {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .stageBadge {
+    font-size: 0.72rem;
+  }
+}

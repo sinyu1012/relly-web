@@ -1,8 +1,9 @@
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
   gap: 16px;
   margin-bottom: 20px;
+  min-width: 0;
 }
 
 .heroCopy,
@@ -14,6 +15,7 @@
 
 .heroCopy {
   padding: 24px;
+  min-width: 0;
 }
 
 .heroEyebrow,
@@ -39,10 +41,12 @@
   margin: 16px 0 0;
   color: var(--text-muted);
   max-width: 70ch;
+  overflow-wrap: anywhere;
 }
 
 .heroPanel {
   padding: 24px;
+  min-width: 0;
 }
 
 .heroPanel dl {
@@ -57,6 +61,7 @@
   gap: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-subtle);
+  min-width: 0;
 }
 
 .heroPanel dt {
@@ -66,19 +71,40 @@
 .heroPanel dd {
   margin: 0;
   font-family: var(--font-mono);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  grid-template-areas:
+    "upload status"
+    "action status"
+    "result status";
   gap: 16px;
   align-items: start;
+  min-width: 0;
 }
 
-.primaryColumn,
-.sidebarColumn {
-  display: grid;
-  gap: 16px;
+.uploadSlot {
+  grid-area: upload;
+  min-width: 0;
+}
+
+.scanActionCard {
+  grid-area: action;
+}
+
+.scanStatusSlot {
+  grid-area: status;
+  min-width: 0;
+}
+
+.resultSlot {
+  grid-area: result;
+  min-width: 0;
 }
 
 .scanActionCard {
@@ -87,6 +113,11 @@
   gap: 20px;
   align-items: flex-end;
   padding: 24px;
+  min-width: 0;
+}
+
+.scanActionCard > div {
+  min-width: 0;
 }
 
 .scanButton {
@@ -109,6 +140,14 @@
     grid-template-columns: 1fr;
   }
 
+  .grid {
+    grid-template-areas:
+      "upload"
+      "action"
+      "status"
+      "result";
+  }
+
   .scanActionCard {
     flex-direction: column;
     align-items: stretch;
@@ -116,6 +155,30 @@
 
   .scanButton {
     width: 100%;
+    min-width: 0;
   }
 }
 
+@media (max-width: 600px) {
+  .hero {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .heroCopy,
+  .heroPanel,
+  .scanActionCard {
+    padding: 16px;
+  }
+
+  .heroCopy h1,
+  .scanActionCard h2 {
+    font-size: 2rem;
+    line-height: 1.12;
+  }
+
+  .heroEyebrow,
+  .scanActionEyebrow {
+    letter-spacing: 0.12em;
+  }
+}

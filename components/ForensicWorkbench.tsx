@@ -332,7 +332,7 @@ export function ForensicWorkbench({
       </section>
 
       <div className={styles.grid}>
-        <div className={styles.primaryColumn}>
+        <div className={styles.uploadSlot}>
           <UploadPanel
             selectedFileName={selectedAsset?.file.name ?? null}
             selectedFileSize={selectedAsset?.file.size ?? null}
@@ -344,25 +344,35 @@ export function ForensicWorkbench({
             onResolveRemoteUrl={handleResolveRemoteUrl}
             onClearSelection={handleClearSelection}
           />
+        </div>
 
-          <div className={styles.scanActionCard}>
-            <div>
-              <p className={styles.scanActionEyebrow}>Step 02</p>
-              <h2>开始判断</h2>
-              <p>不会上传图片；直接在浏览器里完成本地判断。</p>
-            </div>
-            <button
-              type="button"
-              className={styles.scanButton}
-              onClick={() => {
-                void handleStartScan();
-              }}
-              disabled={!selectedAsset || isScanning}
-            >
-              {isScanning ? "判断中…" : "开始判断"}
-            </button>
+        <div className={styles.scanActionCard}>
+          <div>
+            <p className={styles.scanActionEyebrow}>Step 02</p>
+            <h2>开始判断</h2>
+            <p>不会上传图片；直接在浏览器里完成本地判断。</p>
           </div>
+          <button
+            type="button"
+            className={styles.scanButton}
+            onClick={() => {
+              void handleStartScan();
+            }}
+            disabled={!selectedAsset || isScanning}
+          >
+            {isScanning ? "判断中…" : "开始判断"}
+          </button>
+        </div>
 
+        <div className={styles.scanStatusSlot}>
+          <ScanStatus
+            progress={progress}
+            isScanning={isScanning}
+            scanError={scanError}
+          />
+        </div>
+
+        <div className={styles.resultSlot}>
           <ResultPanel
             result={result}
             reportImageUrl={reportImageUrl}
@@ -375,14 +385,6 @@ export function ForensicWorkbench({
               setAppealOpen(true);
               setAppealMessage("");
             }}
-          />
-        </div>
-
-        <div className={styles.sidebarColumn}>
-          <ScanStatus
-            progress={progress}
-            isScanning={isScanning}
-            scanError={scanError}
           />
         </div>
       </div>

@@ -6,8 +6,9 @@
 
 .header,
 .footer {
-  width: min(1200px, calc(100vw - 32px));
+  width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
+  min-width: 0;
 }
 
 .header {
@@ -19,10 +20,11 @@
 }
 
 .main {
-  width: min(1200px, calc(100vw - 32px));
+  width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
   padding: 24px 0 48px;
   flex: 1;
+  min-width: 0;
 }
 
 .footer {
@@ -36,6 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .wordmarkName {
@@ -49,6 +52,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.16em;
   color: var(--text-muted);
+  line-height: 1.4;
 }
 
 .headerNote {
@@ -56,6 +60,7 @@
   max-width: 420px;
   color: var(--text-muted);
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {
@@ -68,3 +73,23 @@
   }
 }
 
+@media (max-width: 600px) {
+  .header,
+  .footer,
+  .main {
+    width: min(1200px, calc(100% - 24px));
+  }
+
+  .header {
+    gap: 20px;
+    padding: 20px 0 14px;
+  }
+
+  .main {
+    padding: 20px 0 40px;
+  }
+
+  .wordmarkTag {
+    letter-spacing: 0.12em;
+  }
+}

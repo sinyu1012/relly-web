@@ -2,6 +2,8 @@
   border: 1px solid var(--border-strong);
   background: var(--surface);
   padding: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .panelHeader {
@@ -9,6 +11,11 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
+  min-width: 0;
+}
+
+.panelHeader > * {
+  min-width: 0;
 }
 
 .panelHeader h2 {
@@ -29,6 +36,8 @@
   margin: 0;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .emptyState {
@@ -51,6 +60,7 @@
   display: grid;
   grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.15fr);
   gap: 16px;
+  min-width: 0;
 }
 
 .detailGrid {
@@ -64,6 +74,7 @@
 .nextSection {
   border: 1px solid var(--border-subtle);
   background: var(--surface-raised);
+  min-width: 0;
 }
 
 .previewCard {
@@ -73,8 +84,10 @@
 .previewImage {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  max-height: 380px;
+  object-fit: contain;
+  background: #080808;
 }
 
 .summaryCard,
@@ -89,6 +102,11 @@
   justify-content: space-between;
   gap: 16px;
   align-items: center;
+  min-width: 0;
+}
+
+.resultTopline strong {
+  flex: 0 0 auto;
 }
 
 .riskPill {
@@ -132,6 +150,7 @@
 .mutedText {
   margin: 0;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .disclaimer,
@@ -148,6 +167,7 @@
   color: var(--risk);
   font-family: var(--font-mono);
   font-size: 0.82rem;
+  overflow-wrap: anywhere;
 }
 
 .actionRow {
@@ -159,10 +179,14 @@
 
 .primaryButton,
 .secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid var(--border-strong);
   font-weight: 700;
+  text-align: center;
 }
 
 .primaryButton:disabled {
@@ -193,14 +217,19 @@
   gap: 12px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-subtle);
+  min-width: 0;
 }
 
 .definitionList dt {
   color: var(--text-muted);
+  flex: 0 0 auto;
+  max-width: 42%;
+  overflow-wrap: anywhere;
 }
 
 .definitionList dd {
   margin: 0;
+  min-width: 0;
   text-align: right;
   overflow-wrap: anywhere;
 }
@@ -210,6 +239,7 @@
 .actionList {
   margin: 14px 0 0;
   padding-left: 18px;
+  overflow-wrap: anywhere;
 }
 
 .actionList {
@@ -220,6 +250,7 @@
 .actionList li {
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-subtle);
+  overflow-wrap: anywhere;
 }
 
 .actionList strong,
@@ -241,6 +272,8 @@
   padding: 0 10px;
   border: 1px solid currentColor;
   font-weight: 700;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .ai-detected {
@@ -279,6 +312,7 @@
 .metadataGroup summary {
   cursor: pointer;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .metadataGroup .definitionList {
@@ -296,6 +330,7 @@
   border: 1px solid var(--border-subtle);
   background: var(--surface-raised);
   padding: 16px;
+  min-width: 0;
 }
 
 .reportPreviewHeader {
@@ -320,16 +355,21 @@
   display: inline-flex;
   min-height: 40px;
   align-items: center;
+  justify-content: center;
   padding: 0 14px;
   border: 1px solid var(--border-strong);
   color: var(--text);
   text-decoration: none;
   font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .reportPreview img {
   display: block;
   width: 100%;
+  max-height: min(78vh, 760px);
+  object-fit: contain;
   border: 1px solid var(--border-subtle);
   background: var(--bg);
 }
@@ -348,6 +388,8 @@
 
 .tableWrap {
   overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .signalTable {
@@ -362,6 +404,7 @@
   border-bottom: 1px solid var(--border-subtle);
   text-align: left;
   vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
 .signalTable thead th {
@@ -369,15 +412,141 @@
   font-weight: 600;
 }
 
-@media (max-width: 760px) {
-  .panelHeader,
+@media (max-width: 860px) {
   .summaryGrid,
   .detailGrid {
     grid-template-columns: 1fr;
   }
 
+  .panelHeader {
+    flex-direction: column;
+  }
+
+  .meta {
+    text-align: left;
+  }
+
   .reportPreviewHeader {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .panel,
+  .summaryCard,
+  .infoCard,
+  .metadataSection,
+  .signalSection,
+  .nextSection,
+  .reportPreview {
+    padding: 14px;
+  }
+
+  .previewImage {
+    max-height: 320px;
+  }
+
+  .resultTopline {
+    align-items: flex-start;
+  }
+
+  .riskPill {
+    min-height: 34px;
+    line-height: 1.25;
+  }
+
+  .actionRow {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .reportDownload {
+    width: 100%;
+  }
+
+  .definitionList div {
+    display: grid;
+    gap: 4px;
+  }
+
+  .definitionList dt {
+    max-width: none;
+  }
+
+  .definitionList dd {
+    text-align: left;
+  }
+
+  .messageList,
+  .nextActionList,
+  .actionList {
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tableWrap {
+    overflow: visible;
+  }
+
+  .signalTable {
+    min-width: 0;
+  }
+
+  .signalTable,
+  .signalTable tbody,
+  .signalTable tr,
+  .signalTable th,
+  .signalTable td {
+    display: block;
+    width: 100%;
+  }
+
+  .signalTable thead {
+    display: none;
+  }
+
+  .signalTable tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .signalTable tr {
+    border: 1px solid var(--border-subtle);
+    background: var(--surface);
+    padding: 12px;
+  }
+
+  .signalTable tbody th {
+    padding: 0 0 10px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .signalTable td {
+    border-bottom: 0;
+    padding: 10px 0 0;
+  }
+
+  .signalTable td::before {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .signalTable td:nth-of-type(1)::before {
+    content: "状态";
+  }
+
+  .signalTable td:nth-of-type(2)::before {
+    content: "来源";
+  }
+
+  .signalTable td:nth-of-type(3)::before {
+    content: "说明";
   }
 }
