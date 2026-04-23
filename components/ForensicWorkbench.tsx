@@ -253,7 +253,6 @@ export function ForensicWorkbench({
     try {
       const analysis = await analyzeImage({
         file: selectedAsset.file,
-        result,
       });
       setAiImageAnalysis(analysis);
     } catch (error) {

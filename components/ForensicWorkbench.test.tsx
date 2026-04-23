@@ -87,7 +87,7 @@ const mockAiImageAnalysis: AiImageAnalysisResult = {
       detail: "局部文字和边缘过渡不自然，可能来自合成或二次编辑。",
     },
   ],
-  nextActions: ["结合本地元数据和来源链接继续核对。"],
+  nextActions: ["核对原始发布源或权威报道。"],
   model: "test-model",
   analyzedAt: "2026-04-23T00:00:00.000Z",
   disclaimer: "AI 图片分析会把原图发送给外部 AI 服务。",
@@ -160,10 +160,6 @@ describe("ForensicWorkbench", () => {
     await waitFor(() => {
       expect(analyzeImage).toHaveBeenCalledWith({
         file,
-        result: expect.objectContaining({
-          caseId: "CASE-ABC123456789",
-          riskBand: "uncertain",
-        }),
       });
     });
 

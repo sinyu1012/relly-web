@@ -161,14 +161,6 @@ function parseJsonObject(text: string): Record<string, unknown> | null {
   }
 }
 
-function parseImageContext(value: string): unknown {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
-}
-
 function normalizeAnalysis(
   payload: Record<string, unknown> | null,
   fallbackText: string,
@@ -193,7 +185,7 @@ function normalizeAnalysis(
     checks: normalizeChecks(payload?.checks),
     nextActions: normalizeStringArray(
       payload?.nextActions,
-      ["结合本地元数据和 C2PA 结果判断。", "核对原始来源或更早版本。"],
+      ["核对原始发布源、权威报道或更早版本。", "不要只凭单张截图转发结论。"],
       4,
     ),
     model,
@@ -204,14 +196,28 @@ function normalizeAnalysis(
 
 function buildPrompt(): string {
   return [
-    "你是“求真”产品中的 AI 图片分析模块。",
-    "你的任务是观察图片内容，找出视觉层面的 AI 生成、合成、编辑或来源不一致风险。",
-    "不要给出“真/假”绝对裁决；只输出风险提示和可核查的视觉依据。",
-    "本地 EXIF、C2PA、哈希等证据会作为上下文提供；没有 EXIF 或没有 C2PA 不能被当作伪造证据，只能说明可核查信息不足。",
-    "重点观察：不自然的文字、手部/肢体/边缘伪影、光影透视不一致、重复纹理、物体关系异常、截图或新闻图中的上下文矛盾、画面与本地证据摘要冲突。",
-    "如果仅凭视觉无法确认，请明确说明不确定，并建议补充来源链接、原始文件或更早版本。",
+    "你是“求真”产品中的图片内容推理模块，目标是帮助用户发现“图片内容本身是否可疑”。",
+    "只依据图片中可见内容和你的常识/公共知识推理：文字、标题、字幕、LOGO、人物、场景、界面、时间地点、物体关系和画面细节。",
+    "不要引用、猜测或要求 EXIF、C2PA、哈希、文件名、上传时间等元信息；缺少这些元信息不能作为风险依据。",
+    "先抽取图片显式或隐含的核心主张，再判断它是否与基本事实、常识、人物身份、公司关系、时间线、地理、物理规律、品牌/机构语境或平台界面样式冲突。",
+    "对“一眼假”的荒诞新闻、截图或海报要提高风险分。例如图片声称“库克加入小米”“苹果 CEO 成为小米员工”这类与已知人物身份和商业关系高度冲突的内容，应标记为高风险，并说明需要核对权威来源。",
+    "同时观察 AI/合成常见视觉问题：乱码文字、局部文字边缘异常、手部/肢体错误、透视光影不一致、重复纹理、物体关系不合理、截图 UI 拼贴痕迹。",
+    "不要给出“真/假”绝对裁决；输出风险提示、可核查依据和下一步核验建议。若现代新闻或人事变动可能已经变化，请标注需要查证，不要装作确定。",
+    "风险分参考：0-24 内容自洽且无明显视觉异常；25-49 证据不足或轻微可疑；50-74 有明显不一致或疑似合成；75-100 核心主张高度违背常识/公共知识或存在强烈合成迹象。",
     "只返回一个 JSON 对象，不要输出 Markdown。",
     "JSON 字段：aiRiskScore number 0-100；riskBand 为 low/uncertain/elevated/high；summary string；findings string[]；checks 数组，每项含 label、status、detail，status 为 pass/info/warn/risk；nextActions string[]。",
+  ].join("\n");
+}
+
+function buildUserInstruction(): string {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return [
+    `当前日期：${today}。`,
+    "请直接分析这张图片的可见内容。",
+    "如果图片包含文字、新闻标题、聊天记录、海报或截图，请读出核心主张，并做常识/事实一致性推理。",
+    "不要等待或引用任何 EXIF、C2PA、哈希、本地扫描摘要。",
+    "输出结构化 AI 图片分析结果。",
   ].join("\n");
 }
 
@@ -241,7 +247,6 @@ export async function POST(request: Request) {
 
   const formData = await request.formData().catch(() => null);
   const image = formData?.get("image");
-  const rawImageContext = formData?.get("imageContext");
 
   if (!(image instanceof File)) {
     return NextResponse.json(
@@ -263,12 +268,6 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-
-  const imageContext =
-    typeof rawImageContext === "string" && rawImageContext.length <= 8000
-      ? rawImageContext
-      : "null";
-  const parsedImageContext = parseImageContext(imageContext);
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
@@ -292,11 +291,7 @@ export async function POST(request: Request) {
             content: [
               {
                 type: "text",
-                text: JSON.stringify({
-                  imageContext: parsedImageContext,
-                  instruction:
-                    "请结合图片内容和本地证据摘要，输出结构化 AI 图片分析结果。",
-                }),
+                text: buildUserInstruction(),
               },
               {
                 type: "image_url",

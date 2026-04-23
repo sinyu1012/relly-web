@@ -214,9 +214,8 @@ export function ResultPanel({
         <div className={styles.aiAnalysisPanel}>
           <div className={styles.aiAnalysisHeader}>
             <div>
-              <p className={styles.aiAnalysisEyebrow}>Uploaded Image Analysis</p>
+              <p className={styles.aiAnalysisEyebrow}>Image Content Reasoning</p>
               <h3>AI 图片分析详情</h3>
-              <p>服务端已把原图发送给 AIHubMix，以下是视觉模型返回的结构化可疑点。</p>
             </div>
             <div className={styles.aiAnalysisScore}>
               <span
