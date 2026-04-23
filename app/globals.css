@@ -1,0 +1,68 @@
+:root {
+  --bg: #0a0a0a;
+  --surface: #101010;
+  --surface-raised: #151515;
+  --text: #f5f5f5;
+  --text-muted: #b3b3b3;
+  --accent: #4da3ff;
+  --warning: #ffd400;
+  --risk: #ff453a;
+  --success: #2dd36f;
+  --border-strong: rgba(245, 245, 245, 0.22);
+  --border-subtle: rgba(245, 245, 245, 0.12);
+  --font-sans:
+    "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei",
+    system-ui, sans-serif;
+  --font-mono:
+    "SFMono-Regular", "SF Mono", "Roboto Mono", ui-monospace, Menlo, Consolas,
+    monospace;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button,
+input,
+textarea {
+  border-radius: 4px;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(77, 163, 255, 0.3);
+}

@@ -1,0 +1,133 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.overlayOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(460px, 100vw);
+  height: 100%;
+  padding: 20px;
+  border-left: 1px solid var(--border-strong);
+  background: var(--surface);
+  display: grid;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.closeButton,
+.primaryButton,
+.secondaryButton,
+.linkButton {
+  min-height: 44px;
+  border: 1px solid var(--border-strong);
+  padding: 0 16px;
+  font-weight: 700;
+}
+
+.closeButton,
+.secondaryButton {
+  background: transparent;
+  color: var(--text);
+}
+
+.primaryButton {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.primaryButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--text-muted);
+}
+
+.field textarea,
+.field input {
+  border: 1px solid var(--border-strong);
+  background: var(--surface-raised);
+  color: var(--text);
+  padding: 12px;
+}
+
+.attachments {
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+}
+
+.attachments strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.attachments ul {
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+
+.attachments p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.actionRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.message {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+

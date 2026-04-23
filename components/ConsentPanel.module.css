@@ -1,0 +1,84 @@
+.panel {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  padding: 20px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.toggleList {
+  display: grid;
+  gap: 12px;
+}
+
+.toggleCard {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-raised);
+}
+
+.toggleCardActive {
+  border-color: var(--accent);
+}
+
+.toggleIndicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 1px solid currentColor;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.toggleBody {
+  display: grid;
+  gap: 8px;
+}
+
+.toggleBody strong {
+  font-size: 1rem;
+}
+
+.toggleBody span {
+  color: var(--text-muted);
+}
+
+@media (max-width: 760px) {
+  .panelHeader {
+    flex-direction: column;
+  }
+
+  .toggleCard {
+    grid-template-columns: 1fr;
+  }
+}
+

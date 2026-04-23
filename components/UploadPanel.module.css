@@ -1,0 +1,184 @@
+.panel {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  padding: 20px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta,
+.helpText {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.dropzone {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 16px;
+  padding: 18px;
+  border: 1px dashed var(--border-strong);
+  background: var(--surface-raised);
+}
+
+.dropzoneActive {
+  border-style: solid;
+  border-color: var(--accent);
+}
+
+.dropzoneBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dropzoneTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.dropzoneText {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.dropzoneActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  font-weight: 600;
+}
+
+.primaryButton {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: var(--text);
+}
+
+.secondaryButton:disabled {
+  opacity: 0.4;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.previewCard {
+  border: 1px solid var(--border-subtle);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.previewImage {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #111;
+}
+
+.previewMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.previewMeta span {
+  color: var(--text-muted);
+}
+
+.previewEmpty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.previewEmpty span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+}
+
+.remoteRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.remoteField {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.remoteField span {
+  color: var(--text-muted);
+}
+
+.remoteField input {
+  min-height: 44px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 12px;
+}
+
+.helpText {
+  margin-top: 12px;
+}
+
+.errorText {
+  margin: 12px 0 0;
+  padding: 12px;
+  border: 1px solid var(--risk);
+  color: var(--risk);
+  background: rgba(255, 69, 58, 0.08);
+}
+
+@media (max-width: 760px) {
+  .panelHeader,
+  .dropzone,
+  .remoteRow {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+

@@ -1,0 +1,119 @@
+.panel {
+  position: sticky;
+  top: 16px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  padding: 20px;
+}
+
+.panelHeader {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.progressRail {
+  position: relative;
+  height: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent);
+}
+
+.progressHeadline {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+
+.progressHeadline strong {
+  font-size: 1.15rem;
+}
+
+.progressHeadline span {
+  color: var(--text-muted);
+}
+
+.stageList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.stageItem {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.stageActive {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.stageDone {
+  color: var(--success);
+}
+
+.stageError {
+  border-color: var(--risk);
+  color: var(--risk);
+}
+
+.stageBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.stageItem p {
+  margin: 4px 0 0;
+}
+
+.errorText {
+  margin: 12px 0 0;
+  padding: 12px;
+  border: 1px solid var(--risk);
+  color: var(--risk);
+  background: rgba(255, 69, 58, 0.08);
+}
+
+@media (max-width: 960px) {
+  .panel {
+    position: static;
+  }
+}
+

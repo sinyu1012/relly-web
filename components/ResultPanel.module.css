@@ -1,0 +1,239 @@
+.panel {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  padding: 20px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.emptyState {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px dashed var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.emptyState span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+}
+
+.summaryGrid,
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.15fr);
+  gap: 16px;
+}
+
+.detailGrid {
+  margin-top: 16px;
+}
+
+.previewCard,
+.summaryCard,
+.infoCard,
+.signalSection,
+.nextSection {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+}
+
+.previewCard {
+  overflow: hidden;
+}
+
+.previewImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.summaryCard,
+.infoCard,
+.signalSection,
+.nextSection {
+  padding: 16px;
+}
+
+.resultTopline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.riskPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  font-weight: 700;
+}
+
+.risk-low {
+  color: var(--success);
+}
+
+.risk-uncertain {
+  color: var(--warning);
+}
+
+.risk-elevated,
+.risk-high {
+  color: var(--risk);
+}
+
+.riskRail {
+  margin: 14px 0;
+  height: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+}
+
+.riskRail span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.summaryText,
+.disclaimer,
+.metadataNote {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.disclaimer,
+.metadataNote {
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  font-weight: 700;
+}
+
+.primaryButton {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: var(--text);
+}
+
+.definitionList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.definitionList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.definitionList dt {
+  color: var(--text-muted);
+}
+
+.definitionList dd {
+  margin: 0;
+  text-align: right;
+}
+
+.messageList,
+.nextActionList {
+  margin: 14px 0 0;
+  padding-left: 18px;
+}
+
+.signalSection,
+.nextSection {
+  margin-top: 16px;
+}
+
+.signalSection h3,
+.nextSection h3,
+.infoCard h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.signalTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.signalTable th,
+.signalTable td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  vertical-align: top;
+}
+
+.signalTable thead th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .panelHeader,
+  .summaryGrid,
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
