@@ -189,7 +189,8 @@
   text-align: center;
 }
 
-.primaryButton:disabled {
+.primaryButton:disabled,
+.secondaryButton:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
@@ -203,6 +204,14 @@
 .secondaryButton {
   background: transparent;
   color: var(--text);
+}
+
+.aiUploadNote {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .definitionList {
@@ -333,6 +342,99 @@
   min-width: 0;
 }
 
+.aiAnalysisPanel {
+  margin-top: 16px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+  padding: 16px;
+  min-width: 0;
+}
+
+.aiAnalysisHeader,
+.aiAnalysisScore {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.aiAnalysisHeader {
+  margin-bottom: 14px;
+}
+
+.aiAnalysisHeader h3,
+.aiAnalysisGrid h4 {
+  margin: 0;
+}
+
+.aiAnalysisHeader p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+}
+
+.aiAnalysisScore {
+  flex: 0 0 auto;
+}
+
+.aiAnalysisGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.aiChecks {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.aiChecks div {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  min-width: 0;
+}
+
+.aiChecks span {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  margin-right: 8px;
+  padding: 0 8px;
+  border: 1px solid currentColor;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.aiChecks strong,
+.aiChecks p {
+  overflow-wrap: anywhere;
+}
+
+.aiChecks p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.check-pass {
+  color: var(--success);
+}
+
+.check-info {
+  color: var(--accent);
+}
+
+.check-warn {
+  color: var(--warning);
+}
+
+.check-risk,
+.check-error {
+  color: var(--risk);
+}
+
 .reportPreviewHeader {
   display: flex;
   align-items: center;
@@ -429,6 +531,20 @@
   .reportPreviewHeader {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .aiAnalysisHeader,
+  .aiAnalysisScore {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aiAnalysisScore {
+    gap: 10px;
+  }
+
+  .aiAnalysisGrid {
+    grid-template-columns: 1fr;
   }
 }
 

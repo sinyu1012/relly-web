@@ -1,20 +1,25 @@
-import type { ClaimAnalysisResult, QuickScanResult } from "@/lib/types";
+import type { AiImageAnalysisResult, QuickScanResult } from "@/lib/types";
 
-export type ClaimAnalysisInput = {
-  claimText: string;
-  result: QuickScanResult | null;
+export type AiImageAnalysisInput = {
+  file: File;
+  result: QuickScanResult;
 };
 
-function buildImageContext(result: QuickScanResult | null) {
-  if (!result) {
-    return null;
-  }
-
+function buildImageContext(result: QuickScanResult) {
   return {
     caseId: result.caseId,
-    imageRiskScore: result.riskScore,
-    imageRiskBand: result.riskBand,
-    imageSummary: result.summary,
+    localRiskScore: result.riskScore,
+    localRiskBand: result.riskBand,
+    localSummary: result.summary,
+    file: {
+      name: result.fileName,
+      format: result.metadata.format,
+      dimensions: result.metadata.dimensions,
+      hasExif: result.metadata.hasExif,
+      hasXmp: result.metadata.hasXmp,
+      camera: result.metadata.camera,
+      software: result.metadata.software,
+    },
     aiFootprint: {
       status: result.provenance.aiFootprint.status,
       model: result.provenance.aiFootprint.model,
@@ -29,23 +34,21 @@ function buildImageContext(result: QuickScanResult | null) {
   };
 }
 
-export async function analyzeClaimWithAi({
-  claimText,
+export async function analyzeImageWithAi({
+  file,
   result,
-}: ClaimAnalysisInput): Promise<ClaimAnalysisResult> {
+}: AiImageAnalysisInput): Promise<AiImageAnalysisResult> {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("imageContext", JSON.stringify(buildImageContext(result)));
+
   const response = await fetch("/api/ai-detect", {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      claimText,
-      imageContext: buildImageContext(result),
-    }),
+    body: formData,
   });
 
   if (!response.ok) {
-    let detail = "AI 辅助核查失败，请稍后重试。";
+    let detail = "AI 图片分析失败，请稍后重试。";
 
     try {
       const payload = (await response.json()) as { error?: string };
@@ -59,5 +62,5 @@ export async function analyzeClaimWithAi({
     throw new Error(detail);
   }
 
-  return (await response.json()) as ClaimAnalysisResult;
+  return (await response.json()) as AiImageAnalysisResult;
 }

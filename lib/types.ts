@@ -117,18 +117,18 @@ export interface QuickScanResult {
   disclaimer: string;
 }
 
-export interface ClaimAnalysisCheck {
+export interface AiImageAnalysisCheck {
   label: string;
   status: EvidenceStatus;
   detail: string;
 }
 
-export interface ClaimAnalysisResult {
-  claimRiskScore: number;
+export interface AiImageAnalysisResult {
+  aiRiskScore: number;
   riskBand: RiskBand;
   summary: string;
   findings: string[];
-  checks: ClaimAnalysisCheck[];
+  checks: AiImageAnalysisCheck[];
   nextActions: string[];
   model: string;
   analyzedAt: string;

@@ -1,6 +1,11 @@
 "use client";
 
-import type { MetadataField, ProvenanceAction, QuickScanResult } from "@/lib/types";
+import type {
+  AiImageAnalysisResult,
+  MetadataField,
+  ProvenanceAction,
+  QuickScanResult,
+} from "@/lib/types";
 
 import styles from "./ResultPanel.module.css";
 
@@ -9,7 +14,11 @@ type Props = {
   reportImageUrl: string;
   reportExportError: string;
   isExportingReport: boolean;
+  aiImageAnalysis: AiImageAnalysisResult | null;
+  aiImageAnalysisError: string;
+  isAnalyzingImage: boolean;
   onExportReport: () => void;
+  onAnalyzeImage: () => void;
   onOpenAppeal: () => void;
 };
 
@@ -24,6 +33,14 @@ const aiStatusLabels: Record<QuickScanResult["provenance"]["aiFootprint"]["statu
   detected: "检测到 AI 元信息",
   not_detected: "未发现明确 AI 元信息",
   unknown: "无法确认",
+};
+
+const checkStatusLabels: Record<string, string> = {
+  pass: "通过",
+  info: "提示",
+  warn: "注意",
+  risk: "风险",
+  error: "错误",
 };
 
 function FieldList({
@@ -73,7 +90,11 @@ export function ResultPanel({
   reportImageUrl,
   reportExportError,
   isExportingReport,
+  aiImageAnalysis,
+  aiImageAnalysisError,
+  isAnalyzingImage,
   onExportReport,
+  onAnalyzeImage,
   onOpenAppeal,
 }: Props) {
   if (!result) {
@@ -150,19 +171,94 @@ export function ResultPanel({
             <button
               type="button"
               className={styles.secondaryButton}
+              onClick={onAnalyzeImage}
+              disabled={isAnalyzingImage}
+            >
+              {isAnalyzingImage ? "分析中…" : "AI 分析图片"}
+            </button>
+            <button
+              type="button"
+              className={styles.secondaryButton}
               onClick={onOpenAppeal}
             >
               提交申诉
             </button>
           </div>
+          <p className={styles.aiUploadNote}>
+            AI 分析会上传原图到外部服务；本地判断和图片报告仍不上传原图。
+          </p>
 
           {reportExportError ? (
             <p className={styles.errorText} role="alert">
               {reportExportError}
             </p>
           ) : null}
+          {aiImageAnalysisError ? (
+            <p className={styles.errorText} role="alert">
+              {aiImageAnalysisError}
+            </p>
+          ) : null}
         </div>
       </div>
+
+      {aiImageAnalysis ? (
+        <div className={styles.aiAnalysisPanel}>
+          <div className={styles.aiAnalysisHeader}>
+            <div>
+              <h3>AI 图片分析</h3>
+              <p>视觉模型输出，仅作为可疑点提示。</p>
+            </div>
+            <div className={styles.aiAnalysisScore}>
+              <span
+                className={[
+                  styles.riskPill,
+                  styles[`risk-${aiImageAnalysis.riskBand}`],
+                ].join(" ")}
+              >
+                {riskLabels[aiImageAnalysis.riskBand]}
+              </span>
+              <strong>{aiImageAnalysis.aiRiskScore} / 100</strong>
+            </div>
+          </div>
+
+          <p className={styles.summaryText}>{aiImageAnalysis.summary}</p>
+
+          <div className={styles.aiAnalysisGrid}>
+            <div>
+              <h4>主要发现</h4>
+              <ul className={styles.messageList}>
+                {aiImageAnalysis.findings.map((finding) => (
+                  <li key={finding}>{finding}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4>建议动作</h4>
+              <ul className={styles.messageList}>
+                {aiImageAnalysis.nextActions.map((action) => (
+                  <li key={action}>{action}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.aiChecks}>
+            {aiImageAnalysis.checks.map((check) => (
+              <div key={`${check.label}-${check.detail}`}>
+                <span className={styles[`check-${check.status}`]}>
+                  {checkStatusLabels[check.status] ?? check.status}
+                </span>
+                <strong>{check.label}</strong>
+                <p>{check.detail}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className={styles.disclaimer}>
+            {aiImageAnalysis.disclaimer} 模型：{aiImageAnalysis.model}
+          </p>
+        </div>
+      ) : null}
 
       {reportImageUrl ? (
         <div className={styles.reportPreview}>

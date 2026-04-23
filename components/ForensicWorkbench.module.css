@@ -82,8 +82,7 @@
   grid-template-areas:
     "upload status"
     "action status"
-    "result status"
-    "claim status";
+    "result status";
   gap: 16px;
   align-items: start;
   min-width: 0;
@@ -105,14 +104,6 @@
 
 .resultSlot {
   grid-area: result;
-  min-width: 0;
-}
-
-.claimSlot {
-  grid-area: claim;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  padding: 20px;
   min-width: 0;
 }
 
@@ -143,182 +134,6 @@
   cursor: not-allowed;
 }
 
-.claimHeader,
-.claimActions,
-.claimResultTopline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-width: 0;
-}
-
-.claimHeader h2 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.claimMode,
-.claimActions span,
-.claimDisclaimer {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-}
-
-.claimMode {
-  flex: 0 0 auto;
-}
-
-.claimIntro,
-.claimSummary,
-.claimDisclaimer,
-.claimError {
-  margin: 14px 0 0;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.claimIntro,
-.claimDisclaimer {
-  color: var(--text-muted);
-}
-
-.claimTextarea {
-  display: block;
-  width: 100%;
-  min-height: 132px;
-  margin-top: 16px;
-  padding: 14px;
-  resize: vertical;
-  border: 1px solid var(--border-strong);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-}
-
-.claimActions {
-  margin-top: 12px;
-}
-
-.claimButton {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.claimButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.claimError {
-  color: var(--risk);
-}
-
-.claimResult {
-  margin-top: 16px;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-raised);
-  padding: 16px;
-  min-width: 0;
-}
-
-.claimRiskPill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid currentColor;
-  font-weight: 700;
-}
-
-.claimRisk-low {
-  color: var(--success);
-}
-
-.claimRisk-uncertain {
-  color: var(--warning);
-}
-
-.claimRisk-elevated,
-.claimRisk-high {
-  color: var(--risk);
-}
-
-.claimResultGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.claimResultGrid h3 {
-  margin: 0 0 10px;
-  font-size: 1rem;
-}
-
-.claimList {
-  margin: 0;
-  padding-left: 18px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.claimChecks {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.claimChecks div {
-  border-top: 1px solid var(--border-subtle);
-  padding-top: 10px;
-  min-width: 0;
-}
-
-.claimChecks span {
-  display: inline-flex;
-  min-height: 26px;
-  align-items: center;
-  margin-right: 8px;
-  padding: 0 8px;
-  border: 1px solid currentColor;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.claimChecks strong {
-  overflow-wrap: anywhere;
-}
-
-.claimChecks p {
-  margin: 6px 0 0;
-  color: var(--text-muted);
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.check-pass {
-  color: var(--success);
-}
-
-.check-info {
-  color: var(--accent);
-}
-
-.check-warn {
-  color: var(--warning);
-}
-
-.check-risk,
-.check-error {
-  color: var(--risk);
-}
-
 @media (max-width: 960px) {
   .hero,
   .grid {
@@ -330,8 +145,7 @@
       "upload"
       "action"
       "status"
-      "result"
-      "claim";
+      "result";
   }
 
   .scanActionCard {
@@ -344,9 +158,6 @@
     min-width: 0;
   }
 
-  .claimResultGrid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 600px) {
@@ -357,8 +168,7 @@
 
   .heroCopy,
   .heroPanel,
-  .scanActionCard,
-  .claimSlot {
+  .scanActionCard {
     padding: 16px;
   }
 
@@ -373,14 +183,4 @@
     letter-spacing: 0.12em;
   }
 
-  .claimHeader,
-  .claimActions,
-  .claimResultTopline {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .claimButton {
-    width: 100%;
-  }
 }

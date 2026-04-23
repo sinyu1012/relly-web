@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ForensicWorkbench } from "@/components/ForensicWorkbench";
-import type { ClaimAnalysisResult, QuickScanResult } from "@/lib/types";
+import type { AiImageAnalysisResult, QuickScanResult } from "@/lib/types";
 
 function buildMockResult(previewUrl: string): QuickScanResult {
   return {
@@ -75,22 +75,22 @@ function buildMockResult(previewUrl: string): QuickScanResult {
   };
 }
 
-const mockClaimAnalysis: ClaimAnalysisResult = {
-  claimRiskScore: 82,
+const mockAiImageAnalysis: AiImageAnalysisResult = {
+  aiRiskScore: 82,
   riskBand: "high",
-  summary: "配文包含极端数字和缺少来源的强主张，建议先核对权威通报。",
-  findings: ["出现 9.8 级地震这类极端数字，但未提供可核查来源。"],
+  summary: "AI 视觉分析发现画面存在不自然边缘和文字伪影，建议核对来源。",
+  findings: ["画面中文字边缘存在不自然断裂。"],
   checks: [
     {
-      label: "数字合理性",
+      label: "文字和边缘",
       status: "risk",
-      detail: "极端灾害数字需要权威机构或可靠来源支撑。",
+      detail: "局部文字和边缘过渡不自然，可能来自合成或二次编辑。",
     },
   ],
-  nextActions: ["核对官方通报或可靠媒体来源。"],
+  nextActions: ["结合本地元数据和来源链接继续核对。"],
   model: "test-model",
   analyzedAt: "2026-04-23T00:00:00.000Z",
-  disclaimer: "AI 辅助核查只评估配文和主张的可疑程度。",
+  disclaimer: "AI 图片分析会把原图发送给外部 AI 服务。",
 };
 
 describe("ForensicWorkbench", () => {
@@ -143,38 +143,35 @@ describe("ForensicWorkbench", () => {
     ).toBeInTheDocument();
   });
 
-  it("runs AI claim analysis through the injected server-proxy helper", async () => {
+  it("runs AI image analysis through the injected server-proxy helper", async () => {
     const runQuickScan = vi.fn().mockImplementation(async ({ previewUrl }) =>
       buildMockResult(previewUrl),
     );
-    const analyzeClaim = vi.fn().mockResolvedValue(mockClaimAnalysis);
+    const analyzeImage = vi.fn().mockResolvedValue(mockAiImageAnalysis);
 
     const { container } = render(
       <ForensicWorkbench
         runQuickScan={runQuickScan}
-        analyzeClaim={analyzeClaim}
+        analyzeImage={analyzeImage}
       />,
     );
     const fileInput = container.querySelector('input[type="file"]');
+    const file = new File(["demo"], "demo.jpg", { type: "image/jpeg" });
 
     fireEvent.change(fileInput as HTMLInputElement, {
       target: {
-        files: [new File(["demo"], "demo.jpg", { type: "image/jpeg" })],
+        files: [file],
       },
     });
 
     await userEvent.click(screen.getByRole("button", { name: "开始判断" }));
     await screen.findByText("当前证据有限，建议补充原始文件或更多上下文再判断。");
 
-    await userEvent.type(
-      screen.getByPlaceholderText("例如：这张图说某地今晚发生 9.8 级地震，官方不让说。"),
-      "这张图说某地今晚发生 9.8 级地震，官方不让说。",
-    );
-    await userEvent.click(screen.getByRole("button", { name: "AI 辅助核查" }));
+    await userEvent.click(screen.getByRole("button", { name: "AI 分析图片" }));
 
     await waitFor(() => {
-      expect(analyzeClaim).toHaveBeenCalledWith({
-        claimText: "这张图说某地今晚发生 9.8 级地震，官方不让说。",
+      expect(analyzeImage).toHaveBeenCalledWith({
+        file,
         result: expect.objectContaining({
           caseId: "CASE-ABC123456789",
           riskBand: "uncertain",
@@ -183,8 +180,8 @@ describe("ForensicWorkbench", () => {
     });
 
     expect(
-      await screen.findByText("配文包含极端数字和缺少来源的强主张，建议先核对权威通报。"),
+      await screen.findByText("AI 视觉分析发现画面存在不自然边缘和文字伪影，建议核对来源。"),
     ).toBeInTheDocument();
-    expect(screen.getByText("极端灾害数字需要权威机构或可靠来源支撑。")).toBeInTheDocument();
+    expect(screen.getByText("局部文字和边缘过渡不自然，可能来自合成或二次编辑。")).toBeInTheDocument();
   });
 });
