@@ -2,7 +2,7 @@
 
 一个中文优先、移动端优先的图片真伪风险辅助判断工具。用户上传图片后，应用会先在浏览器本地读取可验证线索，给出风险提示、证据项和 PNG 图片报告；也可以手动触发 AI 图片内容推理，用来识别“一眼假”的截图、海报或新闻主张。
 
-在线体验：<https://really-web-sinyus-projects.vercel.app/>
+在线体验：<https://really-web-seven.vercel.app/>
 
 ![求真产品界面](docs/product-screenshot.png)
 
