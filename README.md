@@ -102,4 +102,9 @@ docs/                README 展示素材
 
 ## License
 
-暂未声明开源许可证。
+本项目采用双许可证：
+
+- 社区免费开源：AGPL-3.0-or-later，详见 [LICENSE](LICENSE)。
+- 闭源/专有商业使用：需要另行取得商业授权，详见 [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md)。
+
+商业授权只覆盖本项目权利人拥有的代码和资产；第三方依赖仍按各自许可证使用。
